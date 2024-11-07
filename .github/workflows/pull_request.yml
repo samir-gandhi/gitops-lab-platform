@@ -1,0 +1,131 @@
+name: Pull Request Validation
+on: 
+  pull_request:
+    paths:
+      - 'terraform/**'
+      - '.github/**'
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    env:
+      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: fmt-check
+      run: |
+        terraform fmt -recursive -check .
+
+  lint:
+    needs: [fmt]
+    runs-on: ubuntu-latest
+    env:
+      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: terraform-linters/setup-tflint@v4
+      name: Setup TFLint
+      with:
+        tflint_version: latest
+
+    - name: tflint
+      run: |
+        _branch="${GITHUB_BASE_REF}"
+        case "${_branch}" in
+          "prod")
+            _tfdir=terraform
+            ;;
+          "qa")
+            _tfdir=terraform
+            ;;
+          *)
+            echo "ERROR: Unknown target branch: ${_branch}"
+            exit 1
+        esac
+        cd ${_tfdir}
+        echo "***Running terraform lint***"
+        tflint
+
+  validate:
+    needs: [lint]
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+    - run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _branch="${GITHUB_BASE_REF}"
+        _tfdir=terraform
+        export TF_VAR_pingone_environment_name="${_branch}"
+        case "${_branch}" in
+          "prod")
+            _stateKey=${TF_VAR_tf_state_key_prefix}/prod/terraform.tfstate
+            ;;
+          "qa")
+            _stateKey=${TF_VAR_tf_state_key_prefix}/qa/terraform.tfstate
+            ;;
+          *)
+            echo "ERROR: Unknown target branch: ${_branch}"
+            exit 1
+        esac
+        terraform -chdir=${_tfdir} init \
+          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+          -backend-config="region=$TF_VAR_tf_state_region" \
+          -backend-config="key=${_stateKey}"
+        echo "***Running terraform validate***"
+        terraform -chdir=${_tfdir} validate
+        
+  trivy:
+    needs: [validate]
+    runs-on: ubuntu-latest
+    env:
+      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        hide-progress: false
+        exit-code: '1'
+
+
+  tfplan:
+    needs: [validate]
+    runs-on: ubuntu-latest
+    env:
+      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+    - run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _branch="${GITHUB_BASE_REF}"
+        _tfdir=terraform
+        export TF_VAR_pingone_environment_name="${_branch}"
+        case "${_branch}" in
+          "prod")
+            _stateKey="${TF_VAR_tf_state_key_prefix}/prod/terraform.tfstate"
+            ;;
+          "qa")
+            _stateKey="${TF_VAR_tf_state_key_prefix}/qa/terraform.tfstate"
+            ;;
+          *)
+            echo "ERROR: Unknown target branch: ${_branch}"
+            exit 1
+        esac
+        terraform -chdir=${_tfdir} init \
+          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+          -backend-config="region=$TF_VAR_tf_state_region" \
+          -backend-config="key=${_stateKey}"
+        echo "***Running terraform plan***"
+        terraform -chdir=${_tfdir} plan
