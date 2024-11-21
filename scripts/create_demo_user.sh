@@ -13,6 +13,8 @@ fi
 ## Temp file to store terraform state
 _tfState=$(mktemp)
 terraform -chdir=./terraform show -json > "${_tfState}"
+echo "Terraform state saved to: ${_tfState}"
+cat "${_tfState}"
 
 _sampleUserPopulationId=$(jq -r '.values.root_module.resources[] | select(.name == "sample_users") | .values.id' < ${_tfState})
 export PINGONE_POPULATION_SAMPLE_USERS_ID="${_sampleUserPopulationId}"
