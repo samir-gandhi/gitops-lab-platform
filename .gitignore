@@ -47,3 +47,4 @@ override.tf.json
 .terraformrc
 terraform.rc
 *.hcl
+sample-app/
