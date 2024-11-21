@@ -14,12 +14,6 @@ resource "pingone_environment" "target_environment" {
   ]
 }
 
-# PingOne Environment (Data Source)
-# {@link https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/data-sources/environment}
-data "pingone_environment" "administrators" {
-  name = "Administrators"
-}
-
 # PingOne Utilities Module
 # {@link https://registry.terraform.io/modules/pingidentity/utils/pingone/latest}
 module "pingone_utils" {
@@ -43,6 +37,19 @@ resource "pingone_population_default" "sample_users" {
 
 data "pingone_role" "identity_data_admin" {
   name = "Identity Data Admin"
+}
+
+data "pingone_group" "org_identity_data_admin" {
+  environment_id = var.pingone_client_environment_id
+  name           = "org-identity-admins"
+}
+
+resource "pingone_group_role_assignment" "identity_data_admin" {
+  environment_id = var.pingone_client_environment_id
+  role_id        = data.pingone_role.identity_data_admin.id
+  group_id       = data.pingone_group.org_identity_data_admin.id
+
+  scope_environment_id = pingone_environment.target_environment.id
 }
 
 ##############################################

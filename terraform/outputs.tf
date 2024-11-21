@@ -4,3 +4,7 @@ output "pingone_environment_information" {
     environment_id   = pingone_environment.target_environment.id
   }
 }
+
+# output "sample_user_response" {
+#   value = data.http.create_demo_user.response_body
+# }
