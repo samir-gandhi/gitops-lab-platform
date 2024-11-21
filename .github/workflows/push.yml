@@ -143,3 +143,7 @@ jobs:
         tar -zxf pingcli.tar.gz -C /usr/local/bin pingcli; \
         rm -f pingcli.tar.gz
         pingcli --version
+        terraform -chdir=${_tfdir} 
+        _terraformStateJson=$(terraform -chdir=${_tfdir} show -json)
+        _sampleUserPopulation=$(echo $_terraformStateJson | jq -r '.values.root_module.resources[] | select(.name == "sample_users") | .values.id')
+        echo "Sample User Population: $_sampleUserPopulation"
