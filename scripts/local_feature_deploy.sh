@@ -88,3 +88,7 @@ export TF_VAR_pingfederate_admin_ingress_url="https://${_branch}-pingfederate-ad
 
 terraform -chdir="${TFDIR}" ${_command}
 
+## Create demo user unless destroy command is passed
+if test "${_command}" != "destroy" ; then
+  sh scripts/create_demo_user.sh
+fi

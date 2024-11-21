@@ -1,0 +1,7 @@
+{
+    "type": "EMAIL",
+    "email": "${DEMO_USER_EMAIL_PREFIX}+demouser1${DEMO_USER_ORDINAL}@${DEMO_USER_EMAIL_DOMAIN}",
+    "policy": {
+        "id": "${PINGONE_MFA_POLICY_ID}"
+    }
+}
