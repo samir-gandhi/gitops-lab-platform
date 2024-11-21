@@ -146,7 +146,7 @@ jobs:
         rm -f pingcli.tar.gz
         pingcli --version
         mkdir -p ${HOME}/.pingcli
-        echo PING_CLI_CONFIG_YAML_BASE64 | base64 -d > ${HOME}/.pingcli/config.yaml
+        echo ${PING_CLI_CONFIG_YAML_BASE64} | base64 -d > ${HOME}/.pingcli/config.yaml
 
         ## install envsubst
         curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
