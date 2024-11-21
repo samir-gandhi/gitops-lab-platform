@@ -5,6 +5,6 @@ output "pingone_environment_information" {
   }
 }
 
-# output "sample_user_response" {
-#   value = data.http.create_demo_user.response_body
-# }
+output "mfa_device_policies" {
+  value = data.pingone_mfa_device_policies.mfa_device_policies
+}
