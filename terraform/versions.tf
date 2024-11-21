@@ -5,9 +5,9 @@ terraform {
       source  = "pingidentity/pingone"
       version = "~> 1.0.0"
     }
-    davinci = {
-      source  = "pingidentity/davinci"
-      version = ">= 0.2.1, < 1.0.0"
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.4.5"
     }
   }
   backend "s3" {}
