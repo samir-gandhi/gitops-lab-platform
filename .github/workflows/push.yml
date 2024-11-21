@@ -102,3 +102,63 @@ jobs:
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
         terraform -chdir=${_tfdir} apply --auto-approve
+  create_user:
+    if: ${{ !contains(github.event.commits[0].message, '[skip ci]')}}
+    name: Create User
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+      PING_CLI_CONFIG_YAML_BASE64: ${{ secrets.PING_CLI_CONFIG_YAML_BASE64 }}
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+    - run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _tfdir=terraform
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        export TF_VAR_pingone_environment_name=${_branch}
+        case $_branch in
+          prod)
+            _stateKey="${TF_VAR_tf_state_key_prefix}/prod/terraform.tfstate"
+            ;;
+          qa)
+            _stateKey="${TF_VAR_tf_state_key_prefix}/qa/terraform.tfstate"
+            ;;
+          *)
+            _stateKey="${TF_VAR_tf_state_key_prefix}/dev/${_branch}/terraform.tfstate"
+            ;;
+        esac
+        terraform -chdir=${_tfdir} init \
+          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+          -backend-config="region=$TF_VAR_tf_state_region" \
+          -backend-config="key=${_stateKey}"
+        ## install pingcli
+        RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
+        OS_NAME=$(uname -s); \
+        HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
+        URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}.tar.gz"; \
+        curl -Ls -o pingcli.tar.gz "${URL}"; \
+        tar -zxf pingcli.tar.gz -C /usr/local/bin pingcli; \
+        rm -f pingcli.tar.gz
+        pingcli --version
+        mkdir -p ${HOME}/.pingcli
+        echo ${PING_CLI_CONFIG_YAML_BASE64} | base64 -d > ${HOME}/.pingcli/config.yaml
+        echo "***Running pingclitest:***"
+        pingcli request --http-method GET --service pingone environments --output-format JSON | jq -r '.message' | grep "SUCCESS"
+        if test $? -ne 0; then
+          echo "PingCLI is not able to access the PingOne API. Check your configuration."
+          exit 1
+        fi
+
+        ## install envsubst
+        curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+        chmod +x envsubst
+        sudo mv envsubst /usr/local/bin
+
+        ## check and create user
+        echo "***Creating user***"
+        ./scripts/create_demo_user.sh

@@ -1,0 +1,18 @@
+{
+  "email": "${DEMO_USER_EMAIL_PREFIX}+demouser1@${DEMO_USER_EMAIL_DOMAIN}",
+  "name": {
+    "given": "Demo",
+    "family": "User"
+  },
+  "username": "demouser1",
+  "population": {
+    "id": "${PINGONE_POPULATION_SAMPLE_USERS_ID}"
+  },
+  "lifecycle": {
+    "status": "ACCOUNT_OK"
+  },
+  "password": {
+    "value": "2FederateM0re!",
+    "forceChange": false
+  }
+}
