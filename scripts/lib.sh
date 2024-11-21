@@ -13,7 +13,6 @@ checkVars() {
   "${TF_VAR_pingone_davinci_admin_password}" \
   "${TF_VAR_pingone_davinci_admin_environment_id}" \
   "${TF_VAR_pingone_davinci_admin_region}" \
-  "${TF_VAR_pingone_davinci_user_group_id}" \
   "${TF_VAR_pingone_davinci_terraform_group_id}" \
   "${TF_VAR_pingone_environment_type}" \
   "${AWS_ACCESS_KEY_ID}" \
@@ -32,7 +31,6 @@ checkVars() {
       TF_VAR_pingone_davinci_admin_password
       TF_VAR_pingone_davinci_admin_environment_id
       TF_VAR_pingone_davinci_admin_region
-      TF_VAR_pingone_davinci_user_group_id
       TF_VAR_pingone_davinci_terraform_group_id
       TF_VAR_pingone_environment_type
       AWS_ACCESS_KEY_ID

@@ -84,6 +84,7 @@ terraform -chdir="${TFDIR}" init -migrate-state \
 echo "Running terraform apply for branch: ${_branch}, You will be prompted to enter the required variables."
 
 export TF_VAR_pingone_environment_name="${_branch}"
+export TF_VAR_pingfederate_admin_ingress_url="https://${_branch}-pingfederate-admin.ping-devops.com"
 
 terraform -chdir="${TFDIR}" ${_command}
 
