@@ -30,3 +30,7 @@ resource "pingone_sign_on_policy_action" "default_authn_policy_firstfactor" {
     recovery_enabled = true
   }
 }
+
+data "pingone_mfa_device_policies" "mfa_device_policies" {
+  environment_id = pingone_environment.target_environment.id
+}

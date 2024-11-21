@@ -1,0 +1,18 @@
+{
+  "email": "${DEMO_USER_EMAIL_PREFIX}+demouser1${DEMO_USER_ORDINAL}@${DEMO_USER_EMAIL_DOMAIN}",
+  "name": {
+    "given": "Demo${DEMO_USER_ORDINAL}",
+    "family": "User${DEMO_USER_ORDINAL}"
+  },
+  "username": "demouser1${DEMO_USER_ORDINAL}",
+  "population": {
+    "id": "${PINGONE_POPULATION_SAMPLE_USERS_ID}"
+  },
+  "lifecycle": {
+    "status": "ACCOUNT_OK"
+  },
+  "password": {
+    "value": "${DEMO_USER_PASSWORD}",
+    "forceChange": false
+  }
+}

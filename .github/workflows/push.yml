@@ -135,6 +135,7 @@ jobs:
           -backend-config="bucket=$TF_VAR_tf_state_bucket" \
           -backend-config="region=$TF_VAR_tf_state_region" \
           -backend-config="key=${_stateKey}"
+        ## install pingcli
         RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
         OS_NAME=$(uname -s); \
         HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
@@ -143,6 +144,12 @@ jobs:
         tar -zxf pingcli.tar.gz -C /usr/local/bin pingcli; \
         rm -f pingcli.tar.gz
         pingcli --version
-        _terraformStateJson=$(terraform -chdir=${_tfdir} show -json)
-        _sampleUserPopulation=$(echo $_terraformStateJson | jq -r '.values.root_module.resources[] | select(.name == "sample_users") | .values.id')
-        echo "Sample User Population: $_sampleUserPopulation"
+
+        ## install envsubst
+        curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
+        chmod +x envsubst
+        sudo mv envsubst /usr/local/bin
+
+        ## check and create user
+        echo "***Creating user***"
+        ./scripts/create_demo_user.sh

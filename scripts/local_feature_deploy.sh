@@ -88,3 +88,4 @@ export TF_VAR_pingfederate_admin_ingress_url="https://${_branch}-pingfederate-ad
 
 terraform -chdir="${TFDIR}" ${_command}
 
+sh scripts/create_demo_user.sh

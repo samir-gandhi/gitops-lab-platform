@@ -19,7 +19,10 @@ checkVars() {
   "${AWS_SECRET_ACCESS_KEY}" \
   "${TF_VAR_tf_state_bucket}" \
   "${TF_VAR_tf_state_region}" \
-  "${TF_VAR_tf_state_key_prefix}" ; do
+  "${TF_VAR_tf_state_key_prefix}" \
+  "${DEMO_USER_EMAIL_PREFIX}" \
+  "${DEMO_USER_EMAIL_DOMAIN}" \
+  "${DEMO_USER_PASSWORD}" ; do
     if [ -z "${var}" ]; then
       echo "Please set the required environment variables: 
       TF_VAR_pingone_client_id
@@ -37,7 +40,10 @@ checkVars() {
       AWS_SECRET_ACCESS_KEY
       TF_VAR_tf_state_bucket
       TF_VAR_tf_state_region
-      TF_VAR_tf_state_key_prefix"
+      TF_VAR_tf_state_key_prefix
+      DEMO_USER_EMAIL_PREFIX
+      DEMO_USER_EMAIL_DOMAIN
+      DEMO_USER_PASSWORD"
       exit 1
     fi
   done
