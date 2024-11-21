@@ -149,7 +149,7 @@ jobs:
         echo ${PING_CLI_CONFIG_YAML_BASE64} | base64 -d > ${HOME}/.pingcli/config.yaml
         testPingCLIAccess=$(pingcli request --http-method GET --service pingone environments --output-format JSON | jq -r '.status')
         if [ "$testPingCLIAccess" != "200" ]; then
-          echo "PingCLI is not able to access the PingOne API. Exiting."
+          echo "PingCLI is not able to access the PingOne API. Check your configuration."
           exit 1
         fi
 
