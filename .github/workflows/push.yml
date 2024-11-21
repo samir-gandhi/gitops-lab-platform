@@ -148,18 +148,4 @@ jobs:
         mkdir -p ${HOME}/.pingcli
         echo ${PING_CLI_CONFIG_YAML_BASE64} | base64 -d > ${HOME}/.pingcli/config.yaml
         echo "***Running pingclitest:***"
-        pingcli request --http-method GET --service pingone environments --output-format JSON | jq -r '.status'
-        # testPingCLIAccess=$(pingcli request --http-method GET --service pingone environments --output-format JSON | jq -r '.status')
-        # if [ "$testPingCLIAccess" != "200" ]; then
-        #   echo "PingCLI is not able to access the PingOne API. Check your configuration."
-        #   exit 1
-        # fi
-
-        # ## install envsubst
-        # curl -L https://github.com/a8m/envsubst/releases/download/v1.2.0/envsubst-`uname -s`-`uname -m` -o envsubst
-        # chmod +x envsubst
-        # sudo mv envsubst /usr/local/bin
-
-        # ## check and create user
-        # echo "***Creating user***"
-        # ./scripts/create_demo_user.sh
+        pingcli request --http-method GET --service pingone environments --output-format JSON
