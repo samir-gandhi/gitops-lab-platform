@@ -30,7 +30,7 @@ resource "pingone_application" "worker_app" {
   }
 }
 
-resource "pingone_application_secret" "worker_app" {
+resource "pingone_application_secret" "worker_app_secret" {
   environment_id = pingone_environment.target_environment.id
   application_id = pingone_application.worker_app.id
 }

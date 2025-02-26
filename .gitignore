@@ -47,4 +47,5 @@ override.tf.json
 .terraformrc
 terraform.rc
 *.hcl
-sample-app/
+simple-p1-reg-app/
+dv-p1-protect-reg-app/
