@@ -30,7 +30,7 @@ resource "davinci_connection" "pingoneriskconnector__292873d5ceea806d81373ed0341
     type  = "string"
     value = pingone_group_role_assignment.terraform_sso_davinci_admin.scope_environment_id
   }
-  
+
   property {
     name  = "region"
     type  = "string"
