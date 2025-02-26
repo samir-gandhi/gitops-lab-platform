@@ -1,7 +1,7 @@
 resource "davinci_application" "registration_flow_app" {
   name           = "DaVinci API Protect Sample Application"
   environment_id = pingone_group_role_assignment.terraform_sso_davinci_admin.scope_environment_id
-  
+
   oauth {
     enabled = true
     values {
