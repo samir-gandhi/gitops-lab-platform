@@ -32,6 +32,6 @@ pingcli:
 	@command -v pingcli >/dev/null 2>&1 || { echo >&2 "'pingcli' is required but not installed. Aborting."; exit 1; }
 	@pingcli --version | grep -q $(PINGCLI_VERSION) || { echo >&2 "'pingcli' version is not $(PINGCLI_VERSION). Aborting."; exit 1; }
 
-devcheck: fmt fmt-check validate tflint trivy pingcli
+devcheck: fmt fmt-check validate tflint trivy
 
 .PHONY: devcheck fmt fmt-check validate tflint trivy pingcli
