@@ -26,6 +26,31 @@ variable "pingone_force_delete_population" {
   type        = bool
 }
 
+variable "pingone_davinci_admin_environment_id" {
+  type        = string
+  description = "PingOne ENVIRONMENT ID for the DaVinci Admin Group"
+}
+
+variable "pingone_davinci_admin_username" {
+  type        = string
+  description = "PingOne USERNAME for the DaVinci Admin Group"
+}
+
+variable "pingone_davinci_admin_password" {
+  type        = string
+  description = "PingOne PASSWORD for the DaVinci Admin Group"
+}
+
+variable "pingone_davinci_admin_region" {
+  type        = string
+  description = "PingOne REGION for the DaVinci Admin Group"
+}
+
+variable "pingone_davinci_terraform_group_id" {
+  type        = string
+  description = "PingOne GROUP ID for the DaVinci Terraform Admin Group"
+}
+
 variable "app_url" {
   type        = string
   description = "Application URL"
