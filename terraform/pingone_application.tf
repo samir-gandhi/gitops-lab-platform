@@ -84,3 +84,4 @@ resource "pingone_application_resource_grant" "oidc_sdk_sample_app_revoke_scope"
     pingone_resource_scope.revoke.id
   ]
 }
+
