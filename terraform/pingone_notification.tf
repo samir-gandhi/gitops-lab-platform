@@ -12,17 +12,17 @@ resource "pingone_notification_template_content" "email" {
   locale         = "en"
 
   email = {
-    body          = "<div style=\"display: block; text-align: center; font-family: sans-serif; border: 1px solid #c5c5c5; width: 400px; padding: 50px 30px;\">\n<img class=\"align-self-center mb-5\" src=\"$${logoUrl}\" alt=\"$${companyName}\" style=\"$${logoStyle}\"/>\n     <h1>Success!</h1>\n     <div style=\"margin-top: 20px; margin-bottom:25px\">\n     <p> Please click the link below to confirm your email for Authentication. </p>\n     <a href=\"$${magicLink}\" style=\"font-size: 14pt\">Confirmation Link!</a>\n     </div>\n</div>\n"
-#     body    = <<EOT
-# <div style="display: block; text-align: center; font-family: sans-serif; border: 1px solid #c5c5c5; width: 400px; padding: 50px 30px;">
-# <img class="align-self-center mb-5" src="$${logoUrl}" alt="$${companyName}" style="$${logoStyle}"/>
-#      <h1>Success</h1>
-#      <div style="margin-top: 20px; margin-bottom:25px">
-#      <p> Please click the link below to confirm your email for Authentication. </p>
-#      <a href="$${magicLink}" style="font-size: 14pt">Confirmation Link</a>
-#      </div>
-# </div>
-# EOT
+    body = "<div style=\"display: block; text-align: center; font-family: sans-serif; border: 1px solid #c5c5c5; width: 400px; padding: 50px 30px;\">\n<img class=\"align-self-center mb-5\" src=\"$${logoUrl}\" alt=\"$${companyName}\" style=\"$${logoStyle}\"/>\n     <h1>Success!</h1>\n     <div style=\"margin-top: 20px; margin-bottom:25px\">\n     <p> Please click the link below to confirm your email for Authentication. </p>\n     <a href=\"$${magicLink}\" style=\"font-size: 14pt\">Confirmation Link!</a>\n     </div>\n</div>\n"
+    #     body    = <<EOT
+    # <div style="display: block; text-align: center; font-family: sans-serif; border: 1px solid #c5c5c5; width: 400px; padding: 50px 30px;">
+    # <img class="align-self-center mb-5" src="$${logoUrl}" alt="$${companyName}" style="$${logoStyle}"/>
+    #      <h1>Success</h1>
+    #      <div style="margin-top: 20px; margin-bottom:25px">
+    #      <p> Please click the link below to confirm your email for Authentication. </p>
+    #      <a href="$${magicLink}" style="font-size: 14pt">Confirmation Link</a>
+    #      </div>
+    # </div>
+    # EOT
     subject = "Magic Link Authentication"
 
     from = {
