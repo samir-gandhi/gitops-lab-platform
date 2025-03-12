@@ -84,3 +84,45 @@ resource "pingone_application_resource_grant" "oidc_sdk_sample_app_revoke_scope"
     pingone_resource_scope.revoke.id
   ]
 }
+
+# __generated__ by Terraform
+# Please review these resources and move them into your main configuration files.
+
+# __generated__ by Terraform from "ef46b4cd-075f-4af4-9a08-0871e3fb22bf/06a7145d-a2cc-4121-b144-9db62f0f5c44"
+resource "pingone_application" "pingcli--add-demo-app-002E--0020-_-0020---0020-symbol" {
+  enabled                = false
+  environment_id         = "ef46b4cd-075f-4af4-9a08-0871e3fb22bf"
+  hidden_from_app_portal = false
+  name                   = "add-demo-app. _ - symbol"
+  oidc_options = {
+    allow_wildcard_in_redirect_uris                    = false
+    additional_refresh_token_replay_protection_enabled = true
+    device_polling_interval                            = 5
+    device_timeout                                     = 600
+    grant_types                                        = ["AUTHORIZATION_CODE"]
+    par_requirement                                    = "OPTIONAL"
+    par_timeout                                        = 60
+    pkce_enforcement                                   = "OPTIONAL"
+    response_types                                     = ["CODE"]
+    token_endpoint_auth_method                         = "CLIENT_SECRET_BASIC"
+    type                                               = "WEB_APP"
+  }
+}
+
+# __generated__ by Terraform from "ef46b4cd-075f-4af4-9a08-0871e3fb22bf/06a7145d-a2cc-4121-b144-9db62f0f5c44"
+resource "pingone_application_secret" "pingcli--add-demo-app-002E--0020-_-0020---0020-symbol_secret" {
+  application_id = "06a7145d-a2cc-4121-b144-9db62f0f5c44"
+  environment_id = "ef46b4cd-075f-4af4-9a08-0871e3fb22bf"
+}
+
+# __generated__ by Terraform from "ef46b4cd-075f-4af4-9a08-0871e3fb22bf/06a7145d-a2cc-4121-b144-9db62f0f5c44/f6d41400-e571-432e-9151-4ff06e0b51ce"
+resource "pingone_application_attribute_mapping" "pingcli--add-demo-app-002E--0020-_-0020---0020-symbol_sub" {
+  application_id        = "06a7145d-a2cc-4121-b144-9db62f0f5c44"
+  environment_id        = "ef46b4cd-075f-4af4-9a08-0871e3fb22bf"
+  name                  = "sub"
+  oidc_id_token_enabled = true
+  oidc_scopes           = ["75dff2ea-0086-43aa-8080-9aa9acc0e8e6"]
+  oidc_userinfo_enabled = true
+  required              = true
+  value                 = "$${user.id}"
+}
