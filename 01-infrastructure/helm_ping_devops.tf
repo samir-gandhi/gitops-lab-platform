@@ -4,14 +4,14 @@
 # }
 
 resource "helm_release" "ping_devops" {
-  name      = var.k8s_helm_deployment_name
-  namespace = kubernetes_namespace_v1.gitops-lab.metadata[0].name
+  name            = var.k8s_helm_deployment_name
+  namespace       = kubernetes_namespace_v1.gitops-lab.metadata[0].name
   cleanup_on_fail = var.k8s_helm_deployment_name == "prod" || var.k8s_helm_deployment_name == "qa" ? false : true
-  timeout = 180
+  timeout         = 180
 
   repository = "https://helm.pingidentity.com"
   chart      = "ping-devops"
-  version    = "0.11.7"
+  version    = var.ping_devops_chart_version
 
   ## TODO: add values.dev.yaml, or put dev settings via set
   values = [
@@ -47,5 +47,5 @@ resource "helm_release" "ping_devops" {
     name  = "pingdataconsole.enabled"
     value = var.pingdirectory_enabled
   }
-  depends_on = [ kubernetes_secret_v1.ping_devops ]
+  depends_on = [kubernetes_secret_v1.ping_devops]
 }
