@@ -3,11 +3,11 @@ terraform {
   required_providers {
     pingone = {
       source  = "pingidentity/pingone"
-      version = "~> 1.0.0"
+      version = ">= 1.3.0, < 2.0.0"
     }
     davinci = {
       source  = "pingidentity/davinci"
-      version = "~> 0.4.0"
+      version = ">= 0.4.0, < 1.0.0"
     }
     http = {
       source  = "hashicorp/http"
