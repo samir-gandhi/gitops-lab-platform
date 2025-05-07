@@ -34,7 +34,7 @@ jobs:
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
         for _tfdir in "terraform" "01-infrastructure"; do
-          if ${_tfdir} == "terraform" ]; then
+          if "${_tfdir}" == "terraform" ]; then
             _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
           else
             _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
