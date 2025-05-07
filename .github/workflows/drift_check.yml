@@ -1,9 +1,5 @@
 name: Drift Detection
 on: 
-  push:
-    branches:
-      - qa
-      - prod
   schedule:
     # Daily at 1am
     - cron: '0 1 * * *'
@@ -76,7 +72,7 @@ jobs:
           -backend-config="bucket=$TF_VAR_tf_state_bucket" \
           -backend-config="region=$TF_VAR_tf_state_region" \
           -backend-config="key=${_stateKey}"
-        echo "***Running terraform apply***"
+        echo "***Running terraform plan***"
         ## check for no changes
         terraform -chdir=${_tfdir} plan -detailed-exitcode
         if [ $? -eq 0 ]; then
