@@ -1,6 +1,11 @@
 name: Feature Deploy Push
 on: 
   push:
+    paths:
+      - terraform/**/*
+      - .github/workflows/push_config.yml
+      - .github/workflows/pull_request.yml
+      - .github/workflows/drift_check.yml
 
 
 jobs:

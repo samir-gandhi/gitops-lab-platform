@@ -86,8 +86,8 @@ jobs:
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
     - run: |-
-        kubectl version
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
+        kubectl version
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _tfdir=terraform
