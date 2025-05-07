@@ -93,6 +93,7 @@ jobs:
         source tfvars
         _tfdir=01-infrastructure
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        export TF_VAR_k8s_helm_deployment_name="${_branch}"
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
           prod)
