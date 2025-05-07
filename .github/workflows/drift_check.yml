@@ -28,13 +28,13 @@ jobs:
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
           prod)
-            _stateKey="${TF_VAR_tf_state_key_prefix}/prod/terraform.tfstate"
+            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/prod/terraform.tfstate"
             ;;
           qa)
-            _stateKey="${TF_VAR_tf_state_key_prefix}/qa/terraform.tfstate"
+            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/qa/terraform.tfstate"
             ;;
           *)
-            _stateKey="${TF_VAR_tf_state_key_prefix}/dev/${_branch}/terraform.tfstate"
+            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
             ;;
         esac
         terraform -chdir=${_tfdir} init \
@@ -63,13 +63,13 @@ jobs:
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
           prod)
-            _stateKey="${TF_VAR_tf_state_key_prefix}/prod/terraform.tfstate"
+            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/prod/terraform.tfstate"
             ;;
           qa)
-            _stateKey="${TF_VAR_tf_state_key_prefix}/qa/terraform.tfstate"
+            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/qa/terraform.tfstate"
             ;;
           *)
-            _stateKey="${TF_VAR_tf_state_key_prefix}/dev/${_branch}/terraform.tfstate"
+            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
             ;;
         esac
         terraform -chdir=${_tfdir} init \
