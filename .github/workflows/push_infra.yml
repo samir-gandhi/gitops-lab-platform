@@ -1,5 +1,8 @@
 name: Infra Deploy
 on: 
+  create:
+    branches:
+      - '*'
   push:
     paths:
       - 01-infrastructure/**/*
