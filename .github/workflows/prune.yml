@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: hashicorp/setup-terraform@v3
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
@@ -34,11 +36,15 @@ jobs:
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
         for _tfdir in "terraform" "01-infrastructure"; do
-          if test "${_tfdir}" == "terraform" ]; then
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
-          else
-            _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
-          fi
+          case "${_tfdir}" in
+            "terraform")
+              _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
+              ;;
+            "01-infrastructure")
+              _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
+              ;;
+          esac
+          echo "${_stateKey}"
           terraform -chdir=${_tfdir} init \
           -backend-config="bucket=$TF_VAR_tf_state_bucket" \
           -backend-config="region=$TF_VAR_tf_state_region" \

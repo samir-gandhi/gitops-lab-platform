@@ -1,5 +1,10 @@
 name: Feature Deploy Push
 on: 
+  workflow_run:
+    workflows:
+      - Workflow A
+    types:
+      - completed
   create:
     branches:
       - '*'
