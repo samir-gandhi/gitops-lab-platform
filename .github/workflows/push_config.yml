@@ -45,8 +45,7 @@ jobs:
     - name: fmt-check
       run: |
         echo ${Check}
-        echo "${{ needs.check-conditions.outputs.configdeploy }}"
-        echo "${{ needs }}"
+        echo "${{ needs }}" | jq -r '.[]'
         terraform fmt -recursive -check .
 
   lint:
