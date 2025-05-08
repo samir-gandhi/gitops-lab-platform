@@ -34,7 +34,7 @@ jobs:
             echo "should-deploy=false" >> $GITHUB_ENV
           fi
   fmt:
-    if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
+    # if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     runs-on: ubuntu-latest
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
