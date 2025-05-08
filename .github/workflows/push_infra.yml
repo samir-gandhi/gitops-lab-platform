@@ -114,3 +114,4 @@ jobs:
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
         terraform -chdir=${_tfdir} apply --auto-approve
+        
