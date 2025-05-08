@@ -2,7 +2,7 @@ name: Feature Deploy Push
 on: 
   workflow_run:
     workflows:
-      - Workflow A
+      - Infra Deploy
     types:
       - completed
   create:
@@ -15,7 +15,25 @@ on:
 
 
 jobs:
+  check-conditions:
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
+    steps:
+      - name: Determine Deployment Conditions
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            echo "Triggered by Infra Deploy."
+            echo "should-deploy=true" >> $GITHUB_ENV
+          elif [ "${{ github.event_name }}" == "push" ]; then
+            echo "Triggered by config update."
+            echo "should-deploy=true" >> $GITHUB_ENV
+          else
+            echo "No need to deploy config."
+            echo "should-deploy=false" >> $GITHUB_ENV
   fmt:
+    if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     runs-on: ubuntu-latest
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
@@ -24,9 +42,11 @@ jobs:
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
+        echo ${{ needs.check-conditions.outputs.should-deploy}}
         terraform fmt -recursive -check .
 
   lint:
+    if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     needs: [fmt]
     runs-on: ubuntu-latest
     env:
@@ -44,6 +64,7 @@ jobs:
         tflint --recursive
 
   validate:
+    if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     needs: [lint]
     name: validate
     runs-on: ubuntu-latest
@@ -79,8 +100,7 @@ jobs:
         terraform -chdir=${_tfdir} validate
         
   deploy:
-    if: ${{ !contains(github.event.commits[0].message, '[skip ci]')}}
-    name: Deploy
+    if: ${{ !contains(github.event.commits[0].message, '[skip ci]')}} && ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     needs: [validate]
     runs-on: ubuntu-latest
     timeout-minutes: 5
