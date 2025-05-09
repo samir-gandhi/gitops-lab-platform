@@ -26,12 +26,13 @@ jobs:
           toSleep=10
         fi
         if [[ "${{ github.event_name }}" == "push" ]]; then
-        git diff --name-only HEAD^ > /tmp/changed_files.txt
-        echo "Changed files:"
-        cat /tmp/changed_files.txt
-        grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
+          git diff --name-only HEAD^ > /tmp/changed_files.txt
+          echo "Changed files:"
+          cat /tmp/changed_files.txt
+          grep -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
           test $? -eq 0 && toSleep=10
         fi
+        echo "Sleeping for $toSleep seconds to allow infra deploy to initialize..."
         sleep $toSleep
 
         # infra deploy status can be: "in-progress", "ready", "failed"
