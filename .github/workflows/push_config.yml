@@ -14,6 +14,7 @@ jobs:
     name: Init
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
     - run: |-
         # sleep if it's a new branch or infra workflow runs so we can wait for the infra deploy to initialize
         toSleep=0
@@ -47,6 +48,7 @@ jobs:
               ;;
           esac
         done
+
   fmt:
     runs-on: ubuntu-latest
     needs: [init]
