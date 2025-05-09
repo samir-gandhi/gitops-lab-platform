@@ -31,10 +31,11 @@ jobs:
           cat /tmp/changed_files.txt
           ## TODO: this relies on hard coded paths, need to make it more dynamic
           grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
-          if test $? -eq 0 ; then
+          if [[ $? -eq 0 ]] ; then
             toSleep=10
+          else
+            echo "No changes in 01-infrastructure or workflows/push_infra.yml, skipping sleep"
           fi
-          echo "test $? -eq 0"
         fi
         sleep $toSleep
 
