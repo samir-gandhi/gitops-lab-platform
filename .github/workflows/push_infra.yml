@@ -18,7 +18,7 @@ jobs:
     - run: |-
         # infra deploy status can be: "in-progress", "ready", "failed"
         echo "infra_deploy_status=in-progress" >> $GITHUB_ENV
-        echo ${GITHUB_ENV}
+        cat $GITHUB_ENV
         echo "$infra_deploy_status"
   fmt:
     needs: [init]
