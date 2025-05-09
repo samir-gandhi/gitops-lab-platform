@@ -30,12 +30,9 @@ jobs:
           echo "Changed files:"
           cat /tmp/changed_files.txt
           ## TODO: this relies on hard coded paths, need to make it more dynamic
-          grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
-          echo "last command: $?"
-          if [[ $? -eq 0 ]] ; then
+          if test $(grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt); then
+            echo "Infra deploy may be in progress, sleeping for 10 seconds"
             toSleep=10
-          else
-            echo "No changes in 01-infrastructure or workflows/push_infra.yml, skipping sleep"
           fi
         fi
         sleep $toSleep
