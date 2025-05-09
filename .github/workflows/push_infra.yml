@@ -125,6 +125,7 @@ jobs:
         terraform -chdir=${_tfdir} apply --auto-approve
         ## Terraform helm and kubernetes will wait for up to 300 seconds
           ## this should be enough time for the pingfed infra to be ready
+        echo "${{ env.infra_deploy_status }}"
         if [ $? -eq 0 ]; then
           echo "infra_deploy_status=ready" >> $GITHUB_ENV
         else
