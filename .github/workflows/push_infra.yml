@@ -10,7 +10,16 @@ on:
 
 
 jobs:
+  # init must be the first job as config deploy must wait to run
+  init:
+    name: Init
+    runs-on: ubuntu-latest
+    steps:
+    - run: |-
+        # infra deploy status can be: "in-progress", "ready", "failed"
+        echo "infra_deploy_status=in-progress" >> $GITHUB_ENV
   fmt:
+    needs: [init]
     runs-on: ubuntu-latest
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
@@ -114,3 +123,18 @@ jobs:
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
         terraform -chdir=${_tfdir} apply --auto-approve
+        ## Terraform helm and kubernetes will wait for up to 300 seconds
+          ## this should be enough time for the pingfed infra to be ready
+        if [ $? -eq 0 ]; then
+          echo "infra_deploy_status=ready" >> $GITHUB_ENV
+        else
+          echo "infra_deploy_status=failed" >> $GITHUB_ENV
+        fi
+  notify:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify
+      run: |
+        echo "Infra deploy status: ${{ needs.deploy.outputs.infra_deploy_status }}"
+        # Add your notification logic here (e.g., send a message to Slack, email, etc.)
