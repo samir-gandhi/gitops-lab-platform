@@ -64,7 +64,7 @@ jobs:
 
   lint:
     if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
-    needs: [fmt, checks]
+    needs: [fmt]
     runs-on: ubuntu-latest
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
