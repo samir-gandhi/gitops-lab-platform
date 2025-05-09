@@ -29,10 +29,12 @@ jobs:
           git diff --name-only HEAD^ > /tmp/changed_files.txt
           echo "Changed files:"
           cat /tmp/changed_files.txt
-          grep -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
-          test $? -eq 0 && toSleep=10
+          ## TODO: this relies on hard coded paths, need to make it more dynamic
+          grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
+          if test $? -eq 0 ; then
+            toSleep=10
+          fi
         fi
-        echo "Sleeping for $toSleep seconds to allow infra deploy to initialize..."
         sleep $toSleep
 
         # infra deploy status can be: "in-progress", "ready", "failed"
