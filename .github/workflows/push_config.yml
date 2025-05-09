@@ -18,7 +18,7 @@ jobs:
       with:
         fetch-depth: 2
     - run: |-
-        set -x
+        echo "${{ env.infra_deploy_status }}"
         # sleep if it's a new branch or infra workflow runs so we can wait for the infra deploy to initialize
         toSleep=0
         if [[ "${{ github.event_name }}" == "create" ]]; then
@@ -27,8 +27,6 @@ jobs:
         fi
         if [[ "${{ github.event_name }}" == "push" ]]; then
           git diff --name-only HEAD^ > /tmp/changed_files.txt
-          echo "Changed files:"
-          cat /tmp/changed_files.txt
           ## TODO: this relies on hard coded paths, need to make it more dynamic
           if test $(grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt); then
             echo "Infra deploy may be in progress, sleeping for 10 seconds"
