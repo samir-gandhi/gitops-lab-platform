@@ -34,6 +34,7 @@ jobs:
           if test $? -eq 0 ; then
             toSleep=10
           fi
+          echo "test $? -eq 0"
         fi
         sleep $toSleep
 
