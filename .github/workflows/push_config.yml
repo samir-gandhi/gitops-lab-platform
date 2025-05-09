@@ -31,6 +31,7 @@ jobs:
           cat /tmp/changed_files.txt
           ## TODO: this relies on hard coded paths, need to make it more dynamic
           grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
+          echo "last command: $?"
           if [[ $? -eq 0 ]] ; then
             toSleep=10
           else
