@@ -18,6 +18,7 @@ jobs:
       with:
         fetch-depth: 2
     - run: |-
+        echo $GITHUB_ENV
         echo "${{ env.infra_deploy_status }}"
         # sleep if it's a new branch or infra workflow runs so we can wait for the infra deploy to initialize
         toSleep=0
