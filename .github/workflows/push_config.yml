@@ -1,10 +1,5 @@
 name: Feature Deploy Push
 on: 
-  workflow_run:
-    workflows:
-      - Infra Deploy
-    types:
-      - completed
   create:
     branches:
       - '*'
@@ -15,28 +10,46 @@ on:
 
 
 jobs:
-  checks:
+  init:
+    name: Init
     runs-on: ubuntu-latest
-    outputs:
-      configdeploy: ${{ steps.check.outputs.configdeploy }}
     steps:
-      - name: Determine Deployment Conditions
-        id: check
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            echo "Triggered by Infra Deploy."
-            echo "configdeploy=true" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" == "push" ]; then
-            echo "Triggered by config update."
-            echo "configdeploy=true" >> $GITHUB_OUTPUT
-          else
-            echo "No need to deploy config."
-            echo "configdeploy=false" >> $GITHUB_OUTPUT
-          fi
+    - run: |-
+        # sleep if it's a new branch or infra workflow runs so we can wait for the infra deploy to initialize
+        toSleep=0
+        if [[ "${{ github.event_name }}" == "create" ]]; then
+          echo "infra_deploy_status=in-progress" >> $GITHUB_ENV
+          toSleep=10
+        fi
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          echo "Changed files:"
+          git diff --name-only HEAD^ > /tmp/changed_files.txt
+          grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt
+          test $? -eq 0 && toSleep=10
+        fi
+        sleep $toSleep
+
+        # infra deploy status can be: "in-progress", "ready", "failed"
+        echo "Checking if Infra Deploy is in progress..."
+        while [ "${{ env.infra_deploy_status }}" != "ready" ]; do
+          case "${{ env.infra_deploy_status }}" in
+            "in-progress")
+              echo "Infra Deploy is still in progress. Waiting..."
+              sleep 30
+              ;;
+            "failed")
+              echo "Infra Deploy failed. Exiting..."
+              exit 1
+              ;;
+            *)
+              echo "Unknown status: ${{ env.infra_deploy_status }}. Exiting..."
+              exit 1
+              ;;
+          esac
+        done
   fmt:
-    # if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     runs-on: ubuntu-latest
-    needs: [checks]
+    needs: [init]
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
       Check: ${{ needs.checks.outputs.configdeploy }}
