@@ -1,8 +1,5 @@
 name: Infra Deploy
 on: 
-  create:
-    branches:
-      - '*'
   push:
     paths:
       - 01-infrastructure/**/*
@@ -10,23 +7,14 @@ on:
 
 
 jobs:
-  # init must be the first job as config deploy must wait to run
-  init:
-    name: Init
-    runs-on: ubuntu-latest
-    steps:
-    - run: |-
-        # infra deploy status can be: "in-progress", "ready", "failed"
-        echo "infra_deploy_status=in-progress" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        echo "$infra_deploy_status"
   fmt:
-    needs: [init]
     runs-on: ubuntu-latest
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
@@ -91,15 +79,32 @@ jobs:
     name: Deploy
     needs: [validate]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ secrets.AWS_REGION }}
+    - name: Create state file (in-progress)
+      run: |
+        # Status can be in-progress, ready, or failed
+        BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
+        EPOCH_TIME=$(date +%s)
+        echo "{\"branch\":\"$BRANCH_NAME\", \"infraStatus\":\"in-progress\", \"epoch\":$EPOCH_TIME}" > infra_status.json
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        aws_bucket="${TF_VAR_tf_state_bucket}"
+        aws s3 cp infra_status.json "s3://${aws_bucket}/branch_infra_status/${BRANCH_NAME}/infra_status.json"
+
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
-        mkdir ${HOME}/.kube
+    - name: Terraform Apply
+      run: |-
+        mkdir -p ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
         kubectl version
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
@@ -125,19 +130,13 @@ jobs:
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
         terraform -chdir=${_tfdir} apply --auto-approve
-        ## Terraform helm and kubernetes will wait for up to 300 seconds
-          ## this should be enough time for the pingfed infra to be ready
-        echo "${{ env.infra_deploy_status }}"
-        if [ $? -eq 0 ]; then
-          echo "infra_deploy_status=ready" >> $GITHUB_ENV
+        if [ $? -ne 0 ]; then
+          echo "Terraform apply failed, updating infra status to 'failed'"
+          echo "{\"branch\":\"${_branch}\", \"infraStatus\":\"failed\", \"epoch\":$EPOCH_TIME}" > infra_status.json
+          aws s3 cp infra_status.json "s3://${aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+          exit 1
         else
-          echo "infra_deploy_status=failed" >> $GITHUB_ENV
+          echo "Terraform apply succeeded, updating infra status to 'ready'"
+          echo "{\"branch\":\"${_branch}\", \"infraStatus\":\"ready\", \"epoch\":$EPOCH_TIME}" > infra_status.json
+          aws s3 cp infra_status.json "s3://${aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
         fi
-  notify:
-    needs: [deploy]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Notify
-      run: |
-        echo "Infra deploy status: ${{ needs.deploy.outputs.infra_deploy_status }}"
-        # Add your notification logic here (e.g., send a message to Slack, email, etc.)

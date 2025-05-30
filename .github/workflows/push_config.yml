@@ -1,77 +1,26 @@
 name: Feature Deploy Push
 on: 
-  create:
-    branches:
-      - '*'
   push:
     paths:
       - terraform/**/*
       - .github/workflows/push_config.yml
+      - .github/workflows/pull_request.yml
+      - .github/workflows/drift_check.yml
 
 
 jobs:
-  init:
-    name: Init
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 2
-    - run: |-
-        cat $GITHUB_ENV
-        echo "${{ env.infra_deploy_status }}"
-        # sleep if it's a new branch or infra workflow runs so we can wait for the infra deploy to initialize
-        toSleep=0
-        if [[ "${{ github.event_name }}" == "create" ]]; then
-          echo "infra_deploy_status=in-progress" >> $GITHUB_ENV
-          toSleep=10
-        fi
-        if [[ "${{ github.event_name }}" == "push" ]]; then
-          git diff --name-only HEAD^ > /tmp/changed_files.txt
-          ## TODO: this relies on hard coded paths, need to make it more dynamic
-          if test $(grep -q -e "01-infrastructure" -e "workflows/push_infra.yml" /tmp/changed_files.txt); then
-            echo "Infra deploy may be in progress, sleeping for 10 seconds"
-            toSleep=10
-          fi
-        fi
-        sleep $toSleep
-
-        # infra deploy status can be: "in-progress", "ready", "failed"
-        echo "Checking if Infra Deploy is in progress..."
-        while [ "${{ env.infra_deploy_status }}" != "ready" ]; do
-          case "${{ env.infra_deploy_status }}" in
-            "in-progress")
-              echo "Infra Deploy is still in progress. Waiting..."
-              sleep 30
-              ;;
-            "failed")
-              echo "Infra Deploy failed. Exiting..."
-              exit 1
-              ;;
-            *)
-              echo "Unknown status: ${{ env.infra_deploy_status }}. Exiting..."
-              exit 1
-              ;;
-          esac
-        done
-
   fmt:
     runs-on: ubuntu-latest
-    needs: [init]
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
-      Check: ${{ needs.checks.outputs.configdeploy }}
     steps:
     - uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
-        echo ${Check}
-        echo "${{ needs }}" | jq -r '.[]'
         terraform fmt -recursive -check .
 
   lint:
-    if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     needs: [fmt]
     runs-on: ubuntu-latest
     env:
@@ -89,7 +38,6 @@ jobs:
         tflint --recursive
 
   validate:
-    if: ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
     needs: [lint]
     name: validate
     runs-on: ubuntu-latest
@@ -125,15 +73,80 @@ jobs:
         terraform -chdir=${_tfdir} validate
         
   deploy:
-    if: ${{ !contains(github.event.commits[0].message, '[skip ci]')}} && ${{ needs.check-conditions.outputs.should-deploy == 'true' }}
+    if: ${{ !contains(github.event.commits[0].message, '[skip ci]')}}
+    name: Deploy
     needs: [validate]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ secrets.AWS_REGION }}
+    - name: Check Infrastructure Status
+      run: |
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        aws_bucket="${TF_VAR_tf_state_bucket}"
+        STATUS_FILE="s3://${aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+        
+        # Check if the status file exists
+        echo "Checking if infrastructure status file exists..."
+        MAX_RETRIES=30
+        RETRY_COUNT=0
+        
+        while ! aws s3 ls ${STATUS_FILE} &> /dev/null; do
+          if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+            echo "Timeout waiting for infrastructure status file to be created"
+            echo "Infrastructure deployment may not have started yet. Please ensure infrastructure is deployed first."
+            exit 1
+          fi
+          
+          echo "Infrastructure status file not found. Waiting for it to be created (attempt: $((RETRY_COUNT+1))/${MAX_RETRIES})..."
+          RETRY_COUNT=$((RETRY_COUNT+1))
+          sleep 10
+        done
+        
+        echo "Infrastructure status file found. Checking status..."
+        
+        # Check the infrastructure status
+        MAX_RETRIES=30
+        RETRY_COUNT=0
+        
+        while true; do
+          # Download the status file
+          aws s3 cp ${STATUS_FILE} ./infra_status.json
+          
+          # Extract the status
+          INFRA_STATUS=$(cat infra_status.json | grep -o '"infraStatus":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+          echo "Current infrastructure status: ${INFRA_STATUS}"
+          
+          if [ "${INFRA_STATUS}" = "ready" ] || [ "${INFRA_STATUS}" = "success" ]; then
+            echo "Infrastructure is ready. Proceeding with configuration deployment."
+            break
+          elif [ "${INFRA_STATUS}" = "failed" ]; then
+            echo "Infrastructure deployment failed. Cannot proceed with configuration deployment."
+            exit 1
+          elif [ "${INFRA_STATUS}" = "in-progress" ]; then
+            if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+              echo "Timeout waiting for infrastructure deployment to complete"
+              exit 1
+            fi
+            
+            echo "Infrastructure deployment is still in progress. Waiting (attempt: $((RETRY_COUNT+1))/${MAX_RETRIES})..."
+            RETRY_COUNT=$((RETRY_COUNT+1))
+            sleep 10
+          else
+            echo "Unknown infrastructure status: ${INFRA_STATUS}. Exiting."
+            exit 1
+          fi
+        done
     - uses: hashicorp/setup-terraform@v3
     - run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
