@@ -97,8 +97,8 @@ jobs:
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
-        aws_bucket="${TF_VAR_tf_state_bucket}"
-        STATUS_FILE="s3://${aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+        _aws_bucket="${TF_VAR_tf_state_bucket}"
+        STATUS_FILE="s3://${_aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
         
         # Check if the status file exists
         echo "Checking if infrastructure status file exists..."
