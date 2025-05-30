@@ -100,8 +100,8 @@ jobs:
         echo "{\"branch\":\"$BRANCH_NAME\", \"infraStatus\":\"in-progress\", \"epoch\":$EPOCH_TIME}" > infra_status.json
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        aws_bucket="${TF_VAR_tf_state_bucket}"
-        aws s3 cp infra_status.json "s3://${aws_bucket}/branch_infra_status/${BRANCH_NAME}/infra_status.json"
+        _aws_bucket="${TF_VAR_tf_state_bucket}"
+        aws s3 cp infra_status.json "s3://${_aws_bucket}/branch_infra_status/${BRANCH_NAME}/infra_status.json"
 
     - uses: hashicorp/setup-terraform@v3
     - name: Terraform Apply
@@ -111,6 +111,7 @@ jobs:
         kubectl version
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
+        _aws_bucket="${TF_VAR_tf_state_bucket}"
         _tfdir="01-infrastructure"
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
@@ -140,5 +141,5 @@ jobs:
         else
           echo "Terraform apply succeeded, updating infra status to 'ready'"
           echo "{\"branch\":\"${_branch}\", \"infraStatus\":\"ready\", \"epoch\":$EPOCH_TIME}" > infra_status.json
-          aws s3 cp infra_status.json "s3://${aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+          aws s3 cp infra_status.json "s3://${_aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
         fi
