@@ -1,6 +1,7 @@
 terraform.tfvars
 *.bak
 *.local
+.DS_Store
 localvars*
 localsecret*
 glitchenv*

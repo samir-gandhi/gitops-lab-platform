@@ -4,7 +4,6 @@ on:
     paths:
       - terraform/**/*
       - .github/workflows/push_config.yml
-      - .github/workflows/pull_request.yml
       - .github/workflows/drift_check.yml
 
 
@@ -15,6 +14,8 @@ jobs:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
@@ -77,12 +78,78 @@ jobs:
     name: Deploy
     needs: [validate]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      run: |
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+        aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+        aws configure set region ${AWS_REGION}
+    - name: Check Infrastructure Status
+      run: |
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        _aws_bucket="${TF_VAR_tf_state_bucket}"
+        STATUS_FILE="s3://${_aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+        
+        # Check if the status file exists
+        echo "Checking if infrastructure status file exists..."
+        MAX_RETRIES=30
+        RETRY_COUNT=0
+        
+        while ! aws s3 ls ${STATUS_FILE} &> /dev/null; do
+          if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+            echo "Timeout waiting for infrastructure status file to be created"
+            echo "Infrastructure deployment may not have started yet. Please ensure infrastructure is deployed first."
+            exit 1
+          fi
+          
+          echo "Infrastructure status file not found. Waiting for it to be created (attempt: $((RETRY_COUNT+1))/${MAX_RETRIES})..."
+          RETRY_COUNT=$((RETRY_COUNT+1))
+          sleep 10
+        done
+        
+        echo "Infrastructure status file found. Checking status..."
+        
+        # Check the infrastructure status
+        MAX_RETRIES=30
+        RETRY_COUNT=0
+        
+        while true; do
+          # Download the status file
+          aws s3 cp ${STATUS_FILE} ./infra_status.json
+          
+          # Extract the status
+          INFRA_STATUS=$(cat infra_status.json | grep -o '"infraStatus":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+          echo "Current infrastructure status: ${INFRA_STATUS}"
+          
+          if [ "${INFRA_STATUS}" = "ready" ] || [ "${INFRA_STATUS}" = "success" ]; then
+            echo "Infrastructure is ready. Proceeding with configuration deployment."
+            break
+          elif [ "${INFRA_STATUS}" = "failed" ]; then
+            echo "Infrastructure deployment failed. Cannot proceed with configuration deployment."
+            exit 1
+          elif [ "${INFRA_STATUS}" = "in-progress" ]; then
+            if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+              echo "Timeout waiting for infrastructure deployment to complete"
+              exit 1
+            fi
+            
+            echo "Infrastructure deployment is still in progress. Waiting (attempt: $((RETRY_COUNT+1))/${MAX_RETRIES})..."
+            RETRY_COUNT=$((RETRY_COUNT+1))
+            sleep 10
+          else
+            echo "Unknown infrastructure status: ${INFRA_STATUS}. Exiting."
+            exit 1
+          fi
+        done
     - uses: hashicorp/setup-terraform@v3
     - run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
