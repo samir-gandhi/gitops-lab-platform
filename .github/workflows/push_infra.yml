@@ -4,6 +4,7 @@ on:
     paths:
       - 01-infrastructure/**/*
       - .github/workflows/push_infra.yml
+      - .github/workflows/drift_check.yml
 
 
 jobs:
@@ -13,6 +14,8 @@ jobs:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
@@ -77,19 +80,39 @@ jobs:
     name: Deploy
     needs: [validate]
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      run: |
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+        aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+        aws configure set region ${AWS_REGION}
+    - name: Create state file (in-progress)
+      run: |
+        # Status can be in-progress, ready, or failed
+        BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
+        EPOCH_TIME=$(date +%s)
+        echo "{\"branch\":\"$BRANCH_NAME\", \"infraStatus\":\"in-progress\", \"epoch\":$EPOCH_TIME}" > infra_status.json
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _aws_bucket="${TF_VAR_tf_state_bucket}"
+        aws s3 cp infra_status.json "s3://${_aws_bucket}/branch_infra_status/${BRANCH_NAME}/infra_status.json"
+
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
-        mkdir ${HOME}/.kube
+    - name: Terraform Apply
+      run: |-
+        mkdir -p ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
         kubectl version
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
+        _aws_bucket="${TF_VAR_tf_state_bucket}"
         _tfdir="01-infrastructure"
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
@@ -111,3 +134,13 @@ jobs:
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
         terraform -chdir=${_tfdir} apply --auto-approve
+        if [ $? -ne 0 ]; then
+          echo "Terraform apply failed, updating infra status to 'failed'"
+          echo "{\"branch\":\"${_branch}\", \"infraStatus\":\"failed\", \"epoch\":$EPOCH_TIME}" > infra_status.json
+          aws s3 cp infra_status.json "s3://${aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+          exit 1
+        else
+          echo "Terraform apply succeeded, updating infra status to 'ready'"
+          echo "{\"branch\":\"${_branch}\", \"infraStatus\":\"ready\", \"epoch\":$EPOCH_TIME}" > infra_status.json
+          aws s3 cp infra_status.json "s3://${_aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
+        fi
