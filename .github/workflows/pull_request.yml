@@ -2,7 +2,7 @@ name: Pull Request Validation
 on: 
   pull_request:
     paths:
-      - 'terraform/**'
+      - '02-configuration/**'
       - '01-infrastructure/**'
       - '.github/**'
 
@@ -45,11 +45,11 @@ jobs:
       with:
         tflint_version: latest
 
-    - name: tflint
+    - name: TFLint
       run: |
         _branch="${GITHUB_BASE_REF}"
-        echo "***Running terraform lint on terraform and 01-infrastructure directories***"
-        for _tfdir in "terraform" "01-infrastructure"; do
+        echo "***Running terraform lint on 02-configuration and 01-infrastructure directories***"
+        for _tfdir in "02-configuration" "01-infrastructure"; do
           echo "Linting directory: ${_tfdir}"
           cd ${GITHUB_WORKSPACE}/${_tfdir}
           tflint
@@ -66,7 +66,8 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
+    - name: Terraform Validate
+      run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _branch="${GITHUB_BASE_REF}"
@@ -88,12 +89,12 @@ jobs:
             exit 1
         esac
         
-        # Validate both the configuration (terraform) and infrastructure (01-infrastructure) directories
-        for _tfdir in "terraform" "01-infrastructure"; do
+        # Validate both the configuration (02-configuration) and infrastructure (01-infrastructure) directories
+        for _tfdir in "02-configuration" "01-infrastructure"; do
           echo "Validating directory: ${_tfdir}"
           
           # Set the appropriate state key based on directory
-          if [ "${_tfdir}" = "terraform" ]; then
+          if [ "${_tfdir}" = "02-configuration" ]; then
             _stateKey="${_configStateKey}"
           else
             _stateKey="${_infraStateKey}"
@@ -162,8 +163,8 @@ jobs:
         
         # Create plans for both infrastructure and configuration
         # Plan infrastructure first, then configuration
-        for _tfdir in "01-infrastructure" "terraform"; do
-          if [ "${_tfdir}" = "terraform" ]; then
+        for _tfdir in "01-infrastructure" "02-configuration"; do
+          if [ "${_tfdir}" = "02-configuration" ]; then
             echo "Planning configuration changes for environment: ${_branch}"
             _stateKey="${_configStateKey}"
           else

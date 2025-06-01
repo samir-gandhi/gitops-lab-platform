@@ -23,7 +23,8 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - run: |-
+    - name: Terraform Destroy
+      run: |-
         mkdir ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
         kubectl version
@@ -35,9 +36,9 @@ jobs:
         _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        for _tfdir in "terraform" "01-infrastructure"; do
+        for _tfdir in "02-configuration" "01-infrastructure"; do
           case "${_tfdir}" in
-            "terraform")
+            "02-configuration")
               _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
               ;;
             "01-infrastructure")

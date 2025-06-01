@@ -226,7 +226,7 @@ To experience the developer's perspective, a demonstration walkthrough of the st
 
 #### Extract and Review New Configuration
 
-After the application creation is "tested" manually, the new configuration must be added to the Terraform configuration. This addition will happen in a few steps, starting with creating and testing the configuration in the `./terraform` folder.
+After the application creation is "tested" manually, the new configuration must be added to the Terraform configuration. This addition will happen in a few steps, starting with creating and testing the configuration in the `./02-configuration` folder.
 
 1. Navigate to the folder containing the platform repository and check out the development branch:
 
@@ -235,7 +235,7 @@ git pull
 git checkout <branch-name>
 ```
 
-2. Terraform provides a [tool to help generate configuration](https://developer.hashicorp.com/terraform/language/import) for resources built directly in the environment. To leverage this tool as a developer, an import block will be added in a new file: `./terraform/imports.tf`. Create this file now, adding lines similar to the following, replacing environment_id and client_id with the values from the PingOne environment:
+2. Terraform provides a [tool to help generate configuration](https://developer.hashicorp.com/terraform/language/import) for resources built directly in the environment. To leverage this tool as a developer, an import block will be added in a new file: `./02-configuration/imports.tf`. Create this file now, adding lines similar to the following, replacing environment_id and client_id with the values from the PingOne environment:
 
 ```hcl
 import {
@@ -253,7 +253,7 @@ source localsecrets
 ./scripts/local_feature_deploy.sh --generate
 ```
 
-Running this command will create a file with the generated output at `./terraform/generated-platform.tf`
+Running this command will create a file with the generated output at `./02-configuration/generated-platform.tf`
 
 However, the command line may also return errors, for example:
 
@@ -406,7 +406,7 @@ Outputs:
 pingone_environment_id = "<your environment id>"
 ```
 
-5. **Move** the new, generated configuration out of the generated-platform.tf file and into the base module at the bottom of `/terraform/pingone_platform.tf`. 
+5. **Move** the new, generated configuration out of the generated-platform.tf file and into the base module at the bottom of `/02-configuration/pingone_platform.tf`. 
 
 6. To do this move, copy the resource block from the generated-platform.tf file and paste it into the pingone_platform.tf file. Typically, this will be placed above the `output` block at the bottom of the file.
 
@@ -422,7 +422,7 @@ becomes
   environment_id               = pingone_environment.target_environment.id
 ```
 
-8. Delete the terraform/imports.tf and terraform/generated-platform.tf files as they are no longer needed. Another run of the deploy script should show no changes needed.
+8. Delete the 02-configuration/imports.tf and 02-configuration/generated-platform.tf files as they are no longer needed. Another run of the deploy script should show no changes needed.
 
 ### Commit Code for Review and Promotion
 
@@ -437,7 +437,7 @@ Your branch is ahead of 'origin/1-request-new-web-oidc-p1-app-for-my-awesome-oid
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-        modified:   terraform/pingone_platform.tf
+        modified:   02-configuration/pingone_platform.tf
 
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
