@@ -16,10 +16,11 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
+    - name: Terraform Validate
+      run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        _tfdir=terraform
+        _tfdir=02-configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
@@ -51,10 +52,11 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
+    - name: Terraform Drift Check
+      run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        _tfdir=terraform
+        _tfdir=02-configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
