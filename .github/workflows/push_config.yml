@@ -151,7 +151,8 @@ jobs:
           fi
         done
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
+    - name: Terraform Apply
+      run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _tfdir=02-configuration
