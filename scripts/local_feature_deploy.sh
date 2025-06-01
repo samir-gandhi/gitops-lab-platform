@@ -53,7 +53,7 @@ done
 checkVars
 
 _branch=$(git rev-parse --abbrev-ref HEAD)
-export TFDIR="terraform"
+export TFDIR="02-configuration"
 
 if test "$_branch" = "prod" || test  "$_branch" = qa ; then
   echo "You are on a non-dev branch. Please checkout to your feature branch to run this script."

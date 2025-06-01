@@ -1,4 +1,4 @@
-DEV_DIR:=./terraform
+DEV_DIR:=./02-configuration
 PINGCLI_VERSION=0.1.0
 default: devcheck
 

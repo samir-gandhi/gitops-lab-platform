@@ -2,7 +2,7 @@ name: Feature Deploy Push
 on: 
   push:
     paths:
-      - terraform/**/*
+      - 02-configuration/**/*
       - .github/workflows/push_config.yml
       - .github/workflows/drift_check.yml
 
@@ -52,7 +52,7 @@ jobs:
     - run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        _tfdir=terraform
+        _tfdir=02-configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
@@ -154,7 +154,7 @@ jobs:
     - run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        _tfdir=terraform
+        _tfdir=02-configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
