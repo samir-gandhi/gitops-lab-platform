@@ -45,7 +45,7 @@ jobs:
       with:
         tflint_version: latest
 
-    - name: tflint
+    - name: TFLint
       run: |
         _branch="${GITHUB_BASE_REF}"
         echo "***Running terraform lint on 02-configuration and 01-infrastructure directories***"
@@ -66,7 +66,8 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
-    - run: |-
+    - name: Terraform Validate
+      run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _branch="${GITHUB_BASE_REF}"

@@ -23,7 +23,8 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - run: |-
+    - name: Terraform Destroy
+      run: |-
         mkdir ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
         kubectl version
