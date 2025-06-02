@@ -1,9 +1,6 @@
 name: Infra Deploy
 on: 
   create:
-    branches-ignore:
-      - 'qa'
-      - 'prod'
     paths:
       - 01-infrastructure/**/*
       - .github/workflows/push_infra.yml
