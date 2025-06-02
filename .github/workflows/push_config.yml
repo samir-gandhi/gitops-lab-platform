@@ -1,9 +1,6 @@
 name: Feature Deploy Push
 on: 
   create:
-    branches-ignore:
-      - 'qa'
-      - 'prod'
     paths:
       - 02-configuration/**/*
       - .github/workflows/push_config.yml
