@@ -15,7 +15,7 @@ resource "aws_iam_access_key" "pingone_dns_key" {
 resource "aws_iam_policy" "route53_policy" {
   name        = "PingOne-Route53-Policy-${var.pingone_environment_name}"
   description = "Policy to allow managing Route53 records for PingOne domains"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -25,7 +25,7 @@ resource "aws_iam_policy" "route53_policy" {
           "route53:GetChange",
           "route53:ListResourceRecordSets"
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           "arn:aws:route53:::hostedzone/${data.aws_route53_zone.parent_zone.zone_id}",
           "arn:aws:route53:::change/*"

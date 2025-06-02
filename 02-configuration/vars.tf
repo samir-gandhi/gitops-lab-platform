@@ -76,7 +76,7 @@ variable "email_address" {
   type        = string
   description = "Email address used for Let's Encrypt registration and certificate expiry notifications"
   # Replace with a real email address before deployment
-  default     = "samirgandhi@pingidentity.com"
+  default = "samirgandhi@pingidentity.com"
 }
 
 locals {

@@ -34,10 +34,10 @@ provider "acme" {
   # IMPORTANT: Currently using Let's Encrypt staging environment which produces untrusted certificates
   # This is good for testing as it doesn't have strict rate limits
   # When ready for production, comment the staging URL and uncomment the production URL
-  
+
   # Production URL (uncomment when ready):
   server_url = "https://acme-v02.api.letsencrypt.org/directory"
-  
+
   # Staging URL (for testing):
   # server_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
