@@ -3,9 +3,9 @@
 # Define local variables
 locals {
   # Use the branch name (environment name) as the subdomain
-  subdomain    = var.pingone_environment_name
+  subdomain = var.pingone_environment_name
   # Construct the full domain name
-  domain_name  = "${local.subdomain}.${var.parent_domain}"
+  domain_name = "${local.subdomain}.${var.parent_domain}"
 }
 
 resource "tls_private_key" "private_key" {
@@ -147,16 +147,16 @@ output "custom_domain_certificate_expiration" {
 
 # Additional outputs for reference
 output "custom_domain_name" {
-  value = local.domain_name
+  value       = local.domain_name
   description = "The full domain name used for the PingOne environment"
 }
 
 output "custom_domain_status" {
-  value = pingone_custom_domain_verify.custom_domain.status
+  value       = pingone_custom_domain_verify.custom_domain.status
   description = "The status of the custom domain verification"
 }
 
 output "parent_domain_zone_id" {
-  value = data.aws_route53_zone.parent_zone.zone_id
+  value       = data.aws_route53_zone.parent_zone.zone_id
   description = "The Route53 zone ID used for DNS records"
 }
