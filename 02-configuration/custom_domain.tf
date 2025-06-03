@@ -11,7 +11,7 @@ resource "acme_registration" "reg" {
   count = local.create_custom_domain ? 1 : 0
 
   account_key_pem = tls_private_key.private_key[0].private_key_pem
-  email_address   = var.email_address
+  email_address   = var.lets_encrypt_email_address
 }
 
 # Reference the existing hosted zone - needed by all environments for data reference

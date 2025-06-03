@@ -72,11 +72,11 @@ variable "parent_domain" {
 }
 
 # Email for Let's Encrypt registration
-variable "email_address" {
+variable "lets_encrypt_email_address" {
   type        = string
   description = "Email address used for Let's Encrypt registration and certificate expiry notifications"
   # Replace with a real email address before deployment
-  default = "admin@example.com"
+  default = "samirgandhi@pingidentity.com"
 }
 
 locals {
