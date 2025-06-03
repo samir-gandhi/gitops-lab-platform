@@ -123,6 +123,35 @@ To avoid potential conflicts, there is no default information provided in this r
 
 Details on appropriate permissions for the S3 bucket and corresponding AWS IAM user can be found on [Hashicorp's S3 Backend documentation](https://developer.hashicorp.com/terraform/language/settings/backends/s3)
 
+### Custom Domain Configuration
+
+This repository includes support for automatically setting up custom domains for your PingOne environments using AWS Route53 and Let's Encrypt:
+
+#### Prerequisites
+
+1. A domain registered in AWS Route53
+2. AWS credentials with permissions to manage Route53 records
+3. A valid email address for Let's Encrypt registration
+
+#### How It Works
+
+- Custom domains are only created for **qa** and **prod** environments to avoid Let's Encrypt rate limits
+- Each environment gets its own subdomain: `{environment-name}.{parent-domain}`
+- ACME certificates are automatically generated using Let's Encrypt
+- The certificate is applied to the PingOne custom domain configuration
+- AWS Route53 DNS records are automatically created for verification and domain routing
+
+#### Configuration
+
+To use custom domains:
+
+1. Update the `parent_domain` variable in `02-configuration/vars.tf` to your registered domain
+2. Set a valid `email_address` for Let's Encrypt registration
+3. By default, custom domains are only created for environments named "qa" or "prod"
+4. For production use, update the ACME provider in `02-configuration/providers.tf` to use the production URL
+
+> **Note:** Email domain functionality is temporarily disabled for easier testing of the custom domain implementation
+
 ### Github CLI and Github Actions Secrets
 
 #### Github CLI
