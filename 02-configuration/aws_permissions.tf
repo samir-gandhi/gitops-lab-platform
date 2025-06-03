@@ -1,18 +1,24 @@
 # filepath: /Users/samirgandhi/projects/config-automation/gitops-lab/gitops-lab-platform/02-configuration/aws_permissions.tf
 
-# Create IAM user for Route53 DNS management
+# Create IAM user for Route53 DNS management - only for qa and prod
 resource "aws_iam_user" "pingone_dns_user" {
+  count = local.create_custom_domain ? 1 : 0
+
   name = "pingone-dns-manager-${var.pingone_environment_name}"
   path = "/service-accounts/"
 }
 
-# Create access key for the IAM user
+# Create access key for the IAM user - only for qa and prod
 resource "aws_iam_access_key" "pingone_dns_key" {
-  user = aws_iam_user.pingone_dns_user.name
+  count = local.create_custom_domain ? 1 : 0
+
+  user = aws_iam_user.pingone_dns_user[0].name
 }
 
-# Create an IAM policy for Route53 permissions
+# Create an IAM policy for Route53 permissions - only for qa and prod
 resource "aws_iam_policy" "route53_policy" {
+  count = local.create_custom_domain ? 1 : 0
+
   name        = "PingOne-Route53-Policy-${var.pingone_environment_name}"
   description = "Policy to allow managing Route53 records for PingOne domains"
 
@@ -27,7 +33,7 @@ resource "aws_iam_policy" "route53_policy" {
         ]
         Effect = "Allow"
         Resource = [
-          "arn:aws:route53:::hostedzone/${data.aws_route53_zone.parent_zone.zone_id}",
+          "arn:aws:route53:::hostedzone/${data.aws_route53_zone.parent_zone[0].zone_id}",
           "arn:aws:route53:::change/*"
         ]
       },
@@ -40,19 +46,21 @@ resource "aws_iam_policy" "route53_policy" {
   })
 }
 
-# Attach the policy to the user
+# Attach the policy to the user - only for qa and prod
 resource "aws_iam_user_policy_attachment" "pingone_dns_policy_attachment" {
-  user       = aws_iam_user.pingone_dns_user.name
-  policy_arn = aws_iam_policy.route53_policy.arn
+  count = local.create_custom_domain ? 1 : 0
+
+  user       = aws_iam_user.pingone_dns_user[0].name
+  policy_arn = aws_iam_policy.route53_policy[0].arn
 }
 
-# Output IAM credentials for reference
+# Output IAM credentials for reference - conditional outputs
 output "pingone_dns_access_key" {
-  value     = aws_iam_access_key.pingone_dns_key.id
+  value     = local.create_custom_domain ? aws_iam_access_key.pingone_dns_key[0].id : "N/A - Custom domain not enabled"
   sensitive = false
 }
 
 output "pingone_dns_secret_key" {
-  value     = aws_iam_access_key.pingone_dns_key.secret
+  value     = local.create_custom_domain ? aws_iam_access_key.pingone_dns_key[0].secret : "N/A - Custom domain not enabled"
   sensitive = true
 }
