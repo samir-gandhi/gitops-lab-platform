@@ -1,5 +1,10 @@
 name: Feature Deploy Push
 on: 
+  create:
+    paths:
+      - 02-configuration/**/*
+      - .github/workflows/push_config.yml
+      - .github/workflows/drift_check.yml
   push:
     paths:
       - 02-configuration/**/*

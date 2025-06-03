@@ -1,5 +1,10 @@
 name: Infra Deploy
 on: 
+  create:
+    paths:
+      - 01-infrastructure/**/*
+      - .github/workflows/push_infra.yml
+      - .github/workflows/drift_check.yml
   push:
     paths:
       - 01-infrastructure/**/*

@@ -57,6 +57,28 @@ variable "app_url" {
   default     = "https://127.0.0.1:8080"
 }
 
+# AWS Region for Route53 and other resources
+variable "aws_region" {
+  type        = string
+  description = "AWS region for Route53 and other resources"
+  default     = "us-east-1"
+}
+
+# Domain configuration
+variable "parent_domain" {
+  type        = string
+  description = "The parent domain name that's already registered in AWS (e.g., pingfwd.com)"
+  default     = "pingfwd.com"
+}
+
+# Email for Let's Encrypt registration
+variable "email_address" {
+  type        = string
+  description = "Email address used for Let's Encrypt registration and certificate expiry notifications"
+  # Replace with a real email address before deployment
+  default = "admin@example.com"
+}
+
 locals {
   # The URL of the demo app
   redirect_uris = ["${var.app_url}/dashboard.html"]
