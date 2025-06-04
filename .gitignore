@@ -9,6 +9,7 @@ generated
 imports.tf
 generated-platform.tf
 global.js
+*kubeconfig*
 
 # Local .terraform directories
 **/.terraform/*
