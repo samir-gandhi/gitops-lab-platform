@@ -13,7 +13,6 @@ terraform {
       source  = "pingidentity/pingfederate"
       version = ">= 1.4.0, < 2.0.0"
     }
-    
     http = {
       source  = "hashicorp/http"
       version = "~> 3.4.5"
@@ -33,6 +32,10 @@ terraform {
     tls = {
       source  = "hashicorp/tls"
       version = "~> 4.0.5"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.7.0"
     }
   }
   backend "s3" {}
