@@ -4,10 +4,10 @@
 # }
 
 resource "helm_release" "ping_devops" {
-  name            = var.k8s_helm_deployment_name
-  namespace       = kubernetes_namespace_v1.gitops-lab.metadata[0].name
+  name      = var.k8s_helm_deployment_name
+  namespace = kubernetes_namespace_v1.gitops-lab.metadata[0].name
   # cleanup_on_fail = var.k8s_helm_deployment_name == "prod" || var.k8s_helm_deployment_name == "qa" ? false : true
-  timeout         = 360
+  timeout = 360
 
   repository = "https://helm.pingidentity.com"
   chart      = "ping-devops"
