@@ -10,7 +10,7 @@ variable "ping_devops_chart_version" {
 
 variable "pingdirectory_enabled" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "ping_identity_devops_key" {
