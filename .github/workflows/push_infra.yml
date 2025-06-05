@@ -3,6 +3,7 @@ on:
   create:
     paths:
       - 01-infrastructure/**/*
+      - server-profiles/**/*
       - .github/workflows/push_infra.yml
       - .github/workflows/drift_check.yml
   push:
@@ -86,7 +87,7 @@ jobs:
     name: Deploy
     needs: [validate]
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 10
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
