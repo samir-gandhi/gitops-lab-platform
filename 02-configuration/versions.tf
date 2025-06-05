@@ -9,6 +9,11 @@ terraform {
       source  = "pingidentity/davinci"
       version = ">= 0.4.0, < 1.0.0"
     }
+    pingfederate = {
+      source  = "pingidentity/pingfederate"
+      version = ">= 1.4.0, < 2.0.0"
+    }
+    
     http = {
       source  = "hashicorp/http"
       version = "~> 3.4.5"
