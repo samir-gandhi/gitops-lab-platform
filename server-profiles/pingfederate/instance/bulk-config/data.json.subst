@@ -556,6 +556,67 @@
         },
         {
             "operationType": "SAVE",
+            "subResource": "org.sourceid.oauth20.token.AccessGrantManagerLDAPPingDirectoryImpl",
+            "items": [
+                {
+                    "stringValue": "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3",
+                    "id": "PingFederateDSJNDIName",
+                    "type": "STRING"
+                },
+                {
+                    "stringValue": "ou=grants,${USER_BASE_DN}",
+                    "id": "SearchBase",
+                    "type": "STRING"
+                }
+            ],
+            "resourceType": "/configStore"
+        },
+        {
+            "operationType": "SAVE",
+            "subResource": "org.sourceid.saml20.service.session.data.impl.SessionStorageManagerLdapImpl",
+            "items": [
+                {
+                    "stringValue": "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3",
+                    "id": "PingFederateDSJNDIName",
+                    "type": "STRING"
+                },
+                {
+                    "stringValue": "ou=sessions,${USER_BASE_DN}",
+                    "id": "SearchBase",
+                    "type": "STRING"
+                }
+            ],
+            "resourceType": "/configStore"
+        },
+        {
+            "operationType": "SAVE",
+            "subResource": "org.sourceid.saml20.service.impl.AccountLinkingServiceLDAPImpl",
+            "items": [
+                {
+                    "stringValue": "description",
+                    "id": "AccountLinkDataAttribute",
+                    "type": "STRING"
+                },
+                {
+                    "stringValue": "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3",
+                    "id": "PingFederateDSJNDIName",
+                    "type": "STRING"
+                },
+                {
+                    "stringValue": "ou=identities,${USER_BASE_DN}",
+                    "id": "UserSearchBase",
+                    "type": "STRING"
+                },
+                {
+                    "stringValue": "mail",
+                    "id": "UsernameAttribute",
+                    "type": "STRING"
+                }
+            ],
+            "resourceType": "/configStore"
+        },
+        {
+            "operationType": "SAVE",
             "items": [{
                 "apiEnabled": false,
                 "enableApiDescriptions": true
