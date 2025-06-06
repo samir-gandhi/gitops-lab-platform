@@ -655,12 +655,12 @@ resource "pingfederate_password_credential_validator" "pingcli__simple" {
             ]
             sensitive_fields = [
               {
-                name            = "Confirm Password"
-                value           = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
+                name  = "Confirm Password"
+                value = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
               },
               {
-                name            = "Password"
-                value           = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
+                name  = "Password"
+                value = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
               },
             ]
           },
@@ -1081,15 +1081,15 @@ resource "pingfederate_password_credential_validator" "pingcli__simple" {
 
 # __generated__ by Terraform from "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3"
 resource "pingfederate_data_store" "pingcli__LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3_LDAP" {
-  data_store_id     = "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3"
+  data_store_id = "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3"
   ldap_data_store = {
-    bind_anonymously           = false
-    connection_timeout         = 3000
-    create_if_necessary        = true
-    dns_ttl                    = 60000
-    password = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
-    follow_ldap_referrals      = false
-    hostnames                  = ["${var.pingone_environment_name}-pingdirectory:389"]
+    bind_anonymously      = false
+    connection_timeout    = 3000
+    create_if_necessary   = true
+    dns_ttl               = 60000
+    password              = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
+    follow_ldap_referrals = false
+    hostnames             = ["${var.pingone_environment_name}-pingdirectory:389"]
     hostnames_tags = [
       {
         default_source = true
@@ -1858,7 +1858,7 @@ resource "pingfederate_idp_adapter" "pingcli__HTMLFormPD" {
   plugin_descriptor_ref = {
     id = "com.pingidentity.adapters.htmlform.idp.HtmlFormIdpAuthnAdapter"
   }
-  depends_on = [ 
+  depends_on = [
     pingfederate_password_credential_validator.pingcli__pingdirectory
   ]
 }
