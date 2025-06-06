@@ -124,7 +124,7 @@ jobs:
         echo "Infrastructure status file found. Checking status..."
         
         # Check the infrastructure status
-        MAX_RETRIES=30
+        MAX_RETRIES=40
         RETRY_COUNT=0
         
         while true; do
