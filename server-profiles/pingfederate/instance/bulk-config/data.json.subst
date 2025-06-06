@@ -539,6 +539,23 @@
         },
         {
             "operationType": "SAVE",
+            "subResource": "org.sourceid.oauth20.domain.ClientManagerLdapImpl",
+            "items": [
+                {
+                    "stringValue": "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3",
+                    "id": "PingFederateDSJNDIName",
+                    "type": "STRING"
+                },
+                {
+                    "stringValue": "ou=oauthClients,${USER_BASE_DN}",
+                    "id": "SearchBase",
+                    "type": "STRING"
+                }
+            ],
+            "resourceType": "/configStore"
+        },
+        {
+            "operationType": "SAVE",
             "items": [{
                 "apiEnabled": false,
                 "enableApiDescriptions": true
