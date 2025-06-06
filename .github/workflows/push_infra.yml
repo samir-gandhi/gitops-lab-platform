@@ -9,6 +9,7 @@ on:
   push:
     paths:
       - 01-infrastructure/**/*
+      - server-profiles/**/*
       - .github/workflows/push_infra.yml
       - .github/workflows/drift_check.yml
 
