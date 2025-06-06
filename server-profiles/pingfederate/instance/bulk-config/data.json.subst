@@ -235,20 +235,20 @@
             "operationType": "SAVE",
             "items": [{
                 "activeRuntimeServerCerts": [{
-                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/vtcm75en83g6v1r87ytm7lihi",
-                    "id": "vtcm75en83g6v1r87ytm7lihi"
+                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/sslservercert",
+                    "id": "sslservercert"
                 }],
                 "activeAdminConsoleCerts": [{
-                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/vtcm75en83g6v1r87ytm7lihi",
-                    "id": "vtcm75en83g6v1r87ytm7lihi"
+                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/sslservercert",
+                    "id": "sslservercert"
                 }],
                 "adminConsoleCertRef": {
-                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/vtcm75en83g6v1r87ytm7lihi",
-                    "id": "vtcm75en83g6v1r87ytm7lihi"
+                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/sslservercert",
+                    "id": "sslservercert"
                 },
                 "runtimeServerCertRef": {
-                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/vtcm75en83g6v1r87ytm7lihi",
-                    "id": "vtcm75en83g6v1r87ytm7lihi"
+                    "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/sslservercert",
+                    "id": "sslservercert"
                 }
             }],
             "resourceType": "/keyPairs/sslServer/settings"
