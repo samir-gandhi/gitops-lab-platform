@@ -225,6 +225,15 @@
         {
             "operationType": "SAVE",
             "items": [{
+                "password": "${keyPairs_signing_items_devsigningcert_devsigningcert_password}",
+                "fileData": "${keyPairs_signing_items_devsigningcert_devsigningcert_fileData}",
+                "id": "devsigningcert"
+            }],
+            "resourceType": "/keyPairs/signing"
+        },
+        {
+            "operationType": "SAVE",
+            "items": [{
                 "activeRuntimeServerCerts": [{
                     "location": "https://localhost:-1/pf-admin-api/v1/keyPairs/sslServer/vtcm75en83g6v1r87ytm7lihi",
                     "id": "vtcm75en83g6v1r87ytm7lihi"
