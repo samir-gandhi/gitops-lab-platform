@@ -418,6 +418,64 @@
         },
         {
             "operationType": "SAVE",
+            "items": [
+                {
+                    "context": {
+                        "contextRef": {
+                            "location": "https://${PF_ADMIN_PUBLIC_HOSTNAME}:${PF_ADMIN_PUBLIC_PORT_HTTPS}/pf-admin-api/v1/authenticationPolicyContracts/Zxp6N6W5PH9onACT",
+                            "id": "Zxp6N6W5PH9onACT"
+                        },
+                        "type": "AUTHENTICATION_POLICY_CONTRACT"
+                    },
+                    "attributeContractFulfillment": {
+                        "Username": {
+                            "source": {"type": "AUTHENTICATION_POLICY_CONTRACT"},
+                            "value": "subject"
+                        },
+                        "OrgName": {
+                            "source": {"type": "TEXT"},
+                            "value": "PingIdentity"
+                        }
+                    },
+                    "id": "authz_req|apc.Zxp6N6W5PH9onACT|jwt",
+                    "attributeSources": [],
+                    "issuanceCriteria": {"conditionalCriteria": []},
+                    "accessTokenManagerRef": {
+                        "location": "https://${PF_ADMIN_PUBLIC_HOSTNAME}:${PF_ADMIN_PUBLIC_PORT_HTTPS}/pf-admin-api/v1/oauth/accessTokenManagers/jwt",
+                        "id": "jwt"
+                    }
+                },
+                {
+                    "context": {
+                        "contextRef": {
+                            "location": "https://${PF_ADMIN_PUBLIC_HOSTNAME}:${PF_ADMIN_PUBLIC_PORT_HTTPS}/pf-admin-api/v1/passwordCredentialValidators/pingdirectory",
+                            "id": "pingdirectory"
+                        },
+                        "type": "PCV"
+                    },
+                    "attributeContractFulfillment": {
+                        "Username": {
+                            "source": {"type": "PASSWORD_CREDENTIAL_VALIDATOR"},
+                            "value": "mail"
+                        },
+                        "OrgName": {
+                            "source": {"type": "TEXT"},
+                            "value": "PingIdentity"
+                        }
+                    },
+                    "id": "password|pingdirectory|jwt",
+                    "attributeSources": [],
+                    "issuanceCriteria": {"conditionalCriteria": []},
+                    "accessTokenManagerRef": {
+                        "location": "https://${PF_ADMIN_PUBLIC_HOSTNAME}:${PF_ADMIN_PUBLIC_PORT_HTTPS}/pf-admin-api/v1/oauth/accessTokenManagers/jwt",
+                        "id": "jwt"
+                    }
+                }
+            ],
+            "resourceType": "/oauth/accessTokenMappings"
+        },
+        {
+            "operationType": "SAVE",
             "items": [{
                 "redirectValidationLocalSettings": {
                     "enableTargetResourceValidationForSLO": true,
