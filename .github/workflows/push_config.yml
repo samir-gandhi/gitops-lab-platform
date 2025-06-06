@@ -180,3 +180,15 @@ jobs:
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
         terraform -chdir=${_tfdir} apply --auto-approve
+    - name: Replicate PingFederation Configuration
+      run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _tfdir=02-configuration
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        _host="https://pingfederate-admin-${_branch}.ping-devops.com"
+        _uri="/pf-admin-api/v1/cluster/replicate"
+        curl -k -X POST "${_host}${_uri}" \
+          -H "Content-Type: application/json" \
+          -H "X-XSRF-Header: $(date +%s)" \
+          -u "${TF_VAR_pingfederate_api_username}:${TF_VAR_pingfederate_api_password}"
