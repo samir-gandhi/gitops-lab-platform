@@ -17,5 +17,5 @@ output "pingfederate_api_password" {
 }
 
 output "pingfederate_product_version" {
-  value = "12.1"
+  value = "12.2"
 }
