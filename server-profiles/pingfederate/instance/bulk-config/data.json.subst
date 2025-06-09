@@ -474,6 +474,162 @@
             ],
             "resourceType": "/oauth/accessTokenMappings"
         },
+{
+            "operationType": "SAVE",
+            "items": [{
+                "sessionValidationSettings": {
+                    "updateAuthnSessionActivity": false,
+                    "checkValidAuthnSession": false,
+                    "includeSessionId": false,
+                    "checkSessionRevocationStatus": false
+                },
+                "configuration": {
+                    "tables": [
+                        {
+                            "name": "Symmetric Keys",
+                            "rows": []
+                        },
+                        {
+                            "name": "Certificates",
+                            "rows": [{
+                                "defaultRow": false,
+                                "fields": [
+                                    {
+                                        "name": "Key ID",
+                                        "value": "k1"
+                                    },
+                                    {
+                                        "name": "Certificate",
+                                        "value": "devsigningcert"
+                                    }
+                                ]
+                            }]
+                        }
+                    ],
+                    "fields": [
+                        {
+                            "name": "Token Lifetime",
+                            "value": "120"
+                        },
+                        {
+                            "name": "JWS Algorithm",
+                            "value": "RS256"
+                        },
+                        {
+                            "name": "Active Symmetric Key ID",
+                            "value": ""
+                        },
+                        {
+                            "name": "Active Signing Certificate Key ID",
+                            "value": "k1"
+                        },
+                        {
+                            "name": "JWE Algorithm",
+                            "value": ""
+                        },
+                        {
+                            "name": "JWE Content Encryption Algorithm",
+                            "value": ""
+                        },
+                        {
+                            "name": "Active Symmetric Encryption Key ID",
+                            "value": ""
+                        },
+                        {
+                            "name": "Asymmetric Encryption Key",
+                            "value": ""
+                        },
+                        {
+                            "name": "Asymmetric Encryption JWKS URL",
+                            "value": ""
+                        },
+                        {
+                            "name": "Include Key ID Header Parameter",
+                            "value": "true"
+                        },
+                        {
+                            "name": "Include X.509 Thumbprint Header Parameter",
+                            "value": "false"
+                        },
+                        {
+                            "name": "Default JWKS URL Cache Duration",
+                            "value": "720"
+                        },
+                        {
+                            "name": "Include JWE Key ID Header Parameter",
+                            "value": "true"
+                        },
+                        {
+                            "name": "Include JWE X.509 Thumbprint Header Parameter",
+                            "value": "false"
+                        },
+                        {
+                            "name": "Client ID Claim Name",
+                            "value": "client_id_name"
+                        },
+                        {
+                            "name": "Scope Claim Name",
+                            "value": "scope"
+                        },
+                        {
+                            "name": "Space Delimit Scope Values",
+                            "value": "false"
+                        },
+                        {
+                            "name": "Issuer Claim Value",
+                            "value": ""
+                        },
+                        {
+                            "name": "Audience Claim Value",
+                            "value": ""
+                        },
+                        {
+                            "name": "JWT ID Claim Length",
+                            "value": "0"
+                        },
+                        {
+                            "name": "Access Grant GUID Claim Name",
+                            "value": "agid"
+                        },
+                        {
+                            "name": "JWKS Endpoint Path",
+                            "value": ""
+                        },
+                        {
+                            "name": "JWKS Endpoint Cache Duration",
+                            "value": "720"
+                        },
+                        {
+                            "name": "Publish Key ID X.509 URL",
+                            "value": "false"
+                        },
+                        {
+                            "name": "Publish Thumbprint X.509 URL",
+                            "value": "false"
+                        }
+                    ]
+                },
+                "name": "JSON Web Tokens",
+                "id": "jwt",
+                "pluginDescriptorRef": {
+                    "location": "https://${PF_ADMIN_PUBLIC_HOSTNAME}:${PF_ADMIN_PUBLIC_PORT_HTTPS}/pf-admin-api/v1/oauth/accessTokenManagers/descriptors/com.pingidentity.pf.access.token.management.plugins.JwtBearerAccessTokenManagementPlugin",
+                    "id": "com.pingidentity.pf.access.token.management.plugins.JwtBearerAccessTokenManagementPlugin"
+                },
+                "accessControlSettings": {
+                    "restrictClients": false,
+                    "allowedClients": []
+                },
+                "attributeContract": {
+                    "coreAttributes": [],
+                    "extendedAttributes": [
+                        {"name": "Username"},
+                        {"name": "OrgName"}
+                    ]
+                },
+                "selectionSettings": {"resourceUris": []}
+            }],
+            "resourceType": "/oauth/accessTokenManagers"
+        },
         {
             "operationType": "SAVE",
             "items": [{

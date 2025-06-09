@@ -8,7 +8,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.32.0, < 3.0.0"
+      version = ">= 2.36.0, < 3.0.0"
     }
   }
   backend "s3" {}
@@ -22,6 +22,5 @@ provider "helm" {
 }
 
 provider "kubernetes" {
-  # Configuration options
   config_path = "~/.kube/config"
 }

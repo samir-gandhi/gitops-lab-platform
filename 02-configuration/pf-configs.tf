@@ -9,7 +9,8 @@ resource "pingfederate_virtual_host_names" "pingcli__Virtual-0020-Host-0020-Name
 # __generated__ by Terraform from "authz_req|apc.Zxp6N6W5PH9onACT|jwt"
 resource "pingfederate_oauth_access_token_mapping" "pingcli__authz_req-007C-apc-002E-Zxp6N6W5PH9onACT-007C-jwt_AUTHENTICATION_POLICY_CONTRACT" {
   access_token_manager_ref = {
-    id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+    # id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+    id = "jwt"
   }
   attribute_contract_fulfillment = {
     OrgName = {
@@ -142,7 +143,8 @@ resource "pingfederate_idp_sp_connection" "pingcli__docker" {
 # __generated__ by Terraform from "oauth_access_token_manager_settings_singleton_id"
 resource "pingfederate_oauth_access_token_manager_settings" "pingcli__Oauth-0020-Access-0020-Token-0020-Manager-0020-Settings" {
   default_access_token_manager_ref = {
-    id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+    # id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+    id = "jwt"
   }
 }
 
@@ -193,7 +195,8 @@ resource "pingfederate_sp_idp_connection" "pingcli__docker" {
     access_token_manager_mappings = [
       {
         access_token_manager_ref = {
-          id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+          # id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+          id = "jwt"
         }
         attribute_contract_fulfillment = {
           OrgName = {
@@ -679,7 +682,8 @@ resource "pingfederate_password_credential_validator" "pingcli__simple" {
 # __generated__ by Terraform from "pingdelegator"
 # resource "pingfederate_openid_connect_policy" "pingcli__pingdelegator" {
 #   access_token_manager_ref = {
-#     id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+#     # id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+# id = "jwt"
 #   }
 #   attribute_contract = {
 #     extended_attributes = [
@@ -721,7 +725,8 @@ resource "pingfederate_password_credential_validator" "pingcli__simple" {
 # __generated__ by Terraform from "OAuthPlayground"
 # resource "pingfederate_openid_connect_policy" "pingcli__OAuthPlayground" {
 #   access_token_manager_ref = {
-#     id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+#     # id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+# id = "jwt"
 #   }
 #   attribute_contract = {
 #     extended_attributes = [
@@ -1471,7 +1476,8 @@ resource "pingfederate_authentication_policies_settings" "pingcli__Authenticatio
 # # __generated__ by Terraform from "pingaccess"
 # resource "pingfederate_openid_connect_policy" "pingcli__pingaccess" {
 #   access_token_manager_ref = {
-#     id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+#     # id = pingfederate_oauth_access_token_manager.pingcli__JSON-0020-Web-0020-Tokens.manager_id
+# id = "jwt"
 #   }
 #   attribute_contract = {
 #     extended_attributes = [
@@ -2002,209 +2008,209 @@ resource "pingfederate_redirect_validation" "pingcli__Redirect-0020-Validation" 
 }
 
 # __generated__ by Terraform from "jwt"
-resource "pingfederate_oauth_access_token_manager" "pingcli__JSON-0020-Web-0020-Tokens" {
-  access_control_settings = {
-    allowed_clients = [
-    ]
-    restrict_clients = false
-  }
-  attribute_contract = {
-    default_subject_attribute = null
-    extended_attributes = [
-      {
-        multi_valued = false
-        name         = "OrgName"
-      },
-      {
-        multi_valued = false
-        name         = "Username"
-      },
-    ]
-  }
-  configuration = {
-    fields = [
-      {
-        name  = "Access Grant GUID Claim Name"
-        value = "agid"
-      },
-      {
-        name  = "Active Signing Certificate Key ID"
-        value = "k1"
-      },
-      {
-        name  = "Active Symmetric Encryption Key ID"
-        value = ""
-      },
-      {
-        name  = "Active Symmetric Key ID"
-        value = ""
-      },
-      {
-        name  = "Asymmetric Encryption JWKS URL"
-        value = ""
-      },
-      {
-        name  = "Asymmetric Encryption Key"
-        value = ""
-      },
-      {
-        name  = "Audience Claim Value"
-        value = ""
-      },
-      {
-        name  = "Authorization Details Claim Name"
-        value = "authorization_details"
-      },
-      {
-        name  = "Client ID Claim Name"
-        value = "client_id_name"
-      },
-      {
-        name  = "Default JWKS URL Cache Duration"
-        value = "720"
-      },
-      {
-        name  = "Enable Token Revocation"
-        value = "false"
-      },
-      {
-        name  = "Expand Scope Groups"
-        value = "false"
-      },
-      {
-        name  = "Include Issued At Claim"
-        value = "false"
-      },
-      {
-        name  = "Include JWE Key ID Header Parameter"
-        value = "true"
-      },
-      {
-        name  = "Include JWE X.509 Thumbprint Header Parameter"
-        value = "false"
-      },
-      {
-        name  = "Include Key ID Header Parameter"
-        value = "true"
-      },
-      {
-        name  = "Include X.509 Thumbprint Header Parameter"
-        value = "false"
-      },
-      {
-        name  = "Issuer Claim Value"
-        value = ""
-      },
-      {
-        name  = "JWE Algorithm"
-        value = ""
-      },
-      {
-        name  = "JWE Content Encryption Algorithm"
-        value = ""
-      },
-      {
-        name  = "JWKS Endpoint Cache Duration"
-        value = "720"
-      },
-      {
-        name  = "JWKS Endpoint Path"
-        value = ""
-      },
-      {
-        name  = "JWS Algorithm"
-        value = "RS256"
-      },
-      {
-        name  = "JWT ID Claim Length"
-        value = "0"
-      },
-      {
-        name  = "Not Before Claim Offset"
-        value = ""
-      },
-      {
-        name  = "Publish Key ID X.509 URL"
-        value = "false"
-      },
-      {
-        name  = "Publish Keys to the PingFederate JWKS Endpoint"
-        value = "false"
-      },
-      {
-        name  = "Publish Thumbprint X.509 URL"
-        value = "false"
-      },
-      {
-        name  = "Scope Claim Name"
-        value = "scope"
-      },
-      {
-        name  = "Space Delimit Scope Values"
-        value = "false"
-      },
-      {
-        name  = "Token Lifetime"
-        value = "120"
-      },
-      {
-        name  = "Type Header Value"
-        value = ""
-      },
-      {
-        name  = "Use Centralized Signing Key"
-        value = "false"
-      },
-    ]
-    sensitive_fields = [
-    ]
-    tables = [
-      {
-        name = "Symmetric Keys"
-        rows = null
-      },
-      {
-        name = "Certificates"
-        rows = [
-          {
-            default_row = false
-            fields = [
-              {
-                name  = "Certificate"
-                value = "devsigningcert"
-              },
-              {
-                name  = "Key ID"
-                value = "k1"
-              },
-            ]
-            sensitive_fields = [
-            ]
-          },
-        ]
-      },
-    ]
-  }
-  manager_id = "jwt"
-  name       = "JSON Web Tokens"
-  parent_ref = null
-  plugin_descriptor_ref = {
-    id = "com.pingidentity.pf.access.token.management.plugins.JwtBearerAccessTokenManagementPlugin"
-  }
-  selection_settings = {
-    resource_uris = []
-  }
-  session_validation_settings = {
-    check_session_revocation_status = false
-    check_valid_authn_session       = false
-    include_session_id              = false
-    update_authn_session_activity   = false
-  }
-  token_endpoint_attribute_contract = {
-    attributes = [
-    ]
-  }
-}
+# resource "pingfederate_oauth_access_token_manager" "pingcli__JSON-0020-Web-0020-Tokens" {
+#   access_control_settings = {
+#     allowed_clients = [
+#     ]
+#     restrict_clients = false
+#   }
+#   attribute_contract = {
+#     default_subject_attribute = null
+#     extended_attributes = [
+#       {
+#         multi_valued = false
+#         name         = "OrgName"
+#       },
+#       {
+#         multi_valued = false
+#         name         = "Username"
+#       },
+#     ]
+#   }
+#   configuration = {
+#     fields = [
+#       {
+#         name  = "Access Grant GUID Claim Name"
+#         value = "agid"
+#       },
+#       {
+#         name  = "Active Signing Certificate Key ID"
+#         value = "k1"
+#       },
+#       {
+#         name  = "Active Symmetric Encryption Key ID"
+#         value = ""
+#       },
+#       {
+#         name  = "Active Symmetric Key ID"
+#         value = ""
+#       },
+#       {
+#         name  = "Asymmetric Encryption JWKS URL"
+#         value = ""
+#       },
+#       {
+#         name  = "Asymmetric Encryption Key"
+#         value = ""
+#       },
+#       {
+#         name  = "Audience Claim Value"
+#         value = ""
+#       },
+#       {
+#         name  = "Authorization Details Claim Name"
+#         value = "authorization_details"
+#       },
+#       {
+#         name  = "Client ID Claim Name"
+#         value = "client_id_name"
+#       },
+#       {
+#         name  = "Default JWKS URL Cache Duration"
+#         value = "720"
+#       },
+#       {
+#         name  = "Enable Token Revocation"
+#         value = "false"
+#       },
+#       {
+#         name  = "Expand Scope Groups"
+#         value = "false"
+#       },
+#       {
+#         name  = "Include Issued At Claim"
+#         value = "false"
+#       },
+#       {
+#         name  = "Include JWE Key ID Header Parameter"
+#         value = "true"
+#       },
+#       {
+#         name  = "Include JWE X.509 Thumbprint Header Parameter"
+#         value = "false"
+#       },
+#       {
+#         name  = "Include Key ID Header Parameter"
+#         value = "true"
+#       },
+#       {
+#         name  = "Include X.509 Thumbprint Header Parameter"
+#         value = "false"
+#       },
+#       {
+#         name  = "Issuer Claim Value"
+#         value = ""
+#       },
+#       {
+#         name  = "JWE Algorithm"
+#         value = ""
+#       },
+#       {
+#         name  = "JWE Content Encryption Algorithm"
+#         value = ""
+#       },
+#       {
+#         name  = "JWKS Endpoint Cache Duration"
+#         value = "720"
+#       },
+#       {
+#         name  = "JWKS Endpoint Path"
+#         value = ""
+#       },
+#       {
+#         name  = "JWS Algorithm"
+#         value = "RS256"
+#       },
+#       {
+#         name  = "JWT ID Claim Length"
+#         value = "0"
+#       },
+#       {
+#         name  = "Not Before Claim Offset"
+#         value = ""
+#       },
+#       {
+#         name  = "Publish Key ID X.509 URL"
+#         value = "false"
+#       },
+#       {
+#         name  = "Publish Keys to the PingFederate JWKS Endpoint"
+#         value = "false"
+#       },
+#       {
+#         name  = "Publish Thumbprint X.509 URL"
+#         value = "false"
+#       },
+#       {
+#         name  = "Scope Claim Name"
+#         value = "scope"
+#       },
+#       {
+#         name  = "Space Delimit Scope Values"
+#         value = "false"
+#       },
+#       {
+#         name  = "Token Lifetime"
+#         value = "120"
+#       },
+#       {
+#         name  = "Type Header Value"
+#         value = ""
+#       },
+#       {
+#         name  = "Use Centralized Signing Key"
+#         value = "false"
+#       },
+#     ]
+#     sensitive_fields = [
+#     ]
+#     tables = [
+#       {
+#         name = "Symmetric Keys"
+#         rows = null
+#       },
+#       {
+#         name = "Certificates"
+#         rows = [
+#           {
+#             default_row = false
+#             fields = [
+#               {
+#                 name  = "Certificate"
+#                 value = "devsigningcert"
+#               },
+#               {
+#                 name  = "Key ID"
+#                 value = "k1"
+#               },
+#             ]
+#             sensitive_fields = [
+#             ]
+#           },
+#         ]
+#       },
+#     ]
+#   }
+#   manager_id = "jwt"
+#   name       = "JSON Web Tokens"
+#   parent_ref = null
+#   plugin_descriptor_ref = {
+#     id = "com.pingidentity.pf.access.token.management.plugins.JwtBearerAccessTokenManagementPlugin"
+#   }
+#   selection_settings = {
+#     resource_uris = []
+#   }
+#   session_validation_settings = {
+#     check_session_revocation_status = false
+#     check_valid_authn_session       = false
+#     include_session_id              = false
+#     update_authn_session_activity   = false
+#   }
+#   token_endpoint_attribute_contract = {
+#     attributes = [
+#     ]
+#   }
+# }
 
 # resource "pingfederate_keypairs_signing_key" "devsigningcert" {
 #   file_data = "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%"
