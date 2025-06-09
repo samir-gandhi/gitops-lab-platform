@@ -4,6 +4,7 @@ terraform.tfvars
 .DS_Store
 localvars*
 localsecret*
+*kubeconfig*
 glitchenv*
 generated
 imports.tf
