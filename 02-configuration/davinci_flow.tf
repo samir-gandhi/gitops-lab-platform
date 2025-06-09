@@ -18,6 +18,8 @@ resource "davinci_flow" "pingone_davinci_api_protect_example" {
 
   flow_json = file("./davinci_flows/davinci-api-protect-reg-authn-flow.json")
 
+  log_level = 2
+
 
   // Connector link: httpConnector
   connection_link {
