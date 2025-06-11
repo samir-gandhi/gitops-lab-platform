@@ -97,6 +97,9 @@ _bucket_name="${TF_VAR_tf_state_bucket}"
 _region="${TF_VAR_tf_state_region}"
 _key="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
 
+echo "cleaning up old terraform state files in ${TFDIR}..."
+rm -r "${TFDIR}/.terraform" "${TFDIR}/terraform.tfstate"
+
 ## terraform init
 terraform -chdir="${TFDIR}" init -migrate-state \
   -backend-config="bucket=${_bucket_name}" \
