@@ -105,6 +105,6 @@ locals {
 }
 
 variable "provisioner_ds_password" {
-  type        = string
-  default     = "secretpass"
+  type    = string
+  default = "secretpass"
 }

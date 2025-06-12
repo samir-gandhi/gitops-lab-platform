@@ -31,6 +31,6 @@ variable "pingfederate_api_username" {
 }
 
 variable "pingfederate_api_password" {
-  default     = "2FederateM0re"
+  default   = "2FederateM0re"
   sensitive = true
 }

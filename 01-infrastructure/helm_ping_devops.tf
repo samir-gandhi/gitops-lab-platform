@@ -51,10 +51,10 @@ resource "helm_release" "ping_devops" {
     value = var.k8s_helm_deployment_name
   }
 
-  set  {
+  set {
     name  = "pingfederate-admin.envs.CREATE_INITIAL_ADMIN_USER"
     value = "true"
-    type = "string"
+    type  = "string"
   }
 
   set {
