@@ -32,5 +32,5 @@ output "pingdirectory_ldap_service_port" {
 }
 
 output "pingdirectory_admin_ingress_url" {
-  value = format("https://pingdataconsole-%s.ping-devops.com", helm_release.ping_devops.name)
+  value = format("https://%s-pingdataconsole.ping-devops.com", helm_release.ping_devops.name)
 }

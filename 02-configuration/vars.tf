@@ -103,3 +103,8 @@ locals {
   # raw_data     = jsondecode(data.http.get_token.response_body)
   # access_token = local.raw_data.access_token
 }
+
+variable "provisioner_ds_password" {
+  type        = string
+  default     = "secretpass"
+}

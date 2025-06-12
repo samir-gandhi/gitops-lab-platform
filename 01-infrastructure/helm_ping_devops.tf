@@ -51,6 +51,17 @@ resource "helm_release" "ping_devops" {
     value = var.k8s_helm_deployment_name
   }
 
+  set  {
+    name  = "pingfederate-admin.envs.CREATE_INITIAL_ADMIN_USER"
+    value = "true"
+    type = "string"
+  }
+
+  set {
+    name  = "pingfederate-admin.envs.PING_IDENTITY_PASSWORD"
+    value = var.pingfederate_api_password
+  }
+
   set {
     name  = "pingdirectory.enabled"
     value = var.pingdirectory_enabled

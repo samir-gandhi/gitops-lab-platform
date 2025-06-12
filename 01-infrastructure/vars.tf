@@ -25,3 +25,12 @@ variable "ping_identity_devops_user" {
 locals {
   k8s_deployment_namespace = "gitops-lab-${var.k8s_helm_deployment_name}"
 }
+
+variable "pingfederate_api_username" {
+  default = "administrator"
+}
+
+variable "pingfederate_api_password" {
+  default     = "2FederateM0re"
+  sensitive = true
+}
