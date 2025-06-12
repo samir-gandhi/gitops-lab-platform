@@ -104,7 +104,7 @@ locals {
   # access_token = local.raw_data.access_token
 }
 
-variable "provisioner_ds_password" {
-  type    = string
-  default = "secretpass"
-}
+# variable "provisioner_ds_password" {
+#   type    = string
+#   default = "secretpass"
+# }
