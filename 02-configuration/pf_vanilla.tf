@@ -80,43 +80,43 @@ resource "pingfederate_session_authentication_policies_global" "pingcli__Session
   persistent_sessions            = false
 }
 
-##TODO: remove this
-# Data Store Type: JDBC
-# Resource Type: pingfederate_data_store
-import {
-  to = pingfederate_data_store.pingcli__ProvisionerDS_JDBC
-  id = "ProvisionerDS"
-}
+# ##TODO: remove this - This cannot be deleted. Most likely not worth 
+# # Data Store Type: JDBC
+# # Resource Type: pingfederate_data_store
+# import {
+#   to = pingfederate_data_store.pingcli__ProvisionerDS_JDBC
+#   id = "ProvisionerDS"
+# }
 
-# __generated__ by Terraform from "ProvisionerDS"
-resource "pingfederate_data_store" "pingcli__ProvisionerDS_JDBC" {
-  custom_data_store = null
-  data_store_id     = "ProvisionerDS"
-  jdbc_data_store = {
-    allow_multi_value_attributes = false
-    blocking_timeout             = 5000
-    connection_url               = "jdbc:hsqldb:$${pf.server.data.dir}$${/}hypersonic$${/}ProvisionerDefaultDB;hsqldb.lock_file=false"
-    connection_url_tags = [
-      {
-        connection_url = "jdbc:hsqldb:$${pf.server.data.dir}$${/}hypersonic$${/}ProvisionerDefaultDB;hsqldb.lock_file=false"
-        default_source = true
-        tags           = null
-      },
-    ]
-    driver_class = "org.hsqldb.jdbcDriver"
-    # encrypted_password      = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiTkd3bk5NbkRyYyIsInZlcnNpb24iOiIxMi4yLjIuMCJ9..QeBqnwTDsC6GpF2VGP7H4w.u2RSnEkZYpMNOmcHaQDPNg.u4j97uP1KOXyPjtbdBMhvA"
-    idle_timeout            = 5
-    max_pool_size           = 100
-    min_pool_size           = 10
-    name                    = "ProvisionerDS (sa)"
-    password                = var.provisioner_ds_password
-    user_name               = "sa"
-    validate_connection_sql = null
-  }
-  ldap_data_store                  = null
-  mask_attribute_values            = false
-  ping_one_ldap_gateway_data_store = null
-}
+# # __generated__ by Terraform from "ProvisionerDS"
+# resource "pingfederate_data_store" "pingcli__ProvisionerDS_JDBC" {
+#   custom_data_store = null
+#   data_store_id     = "ProvisionerDS"
+#   jdbc_data_store = {
+#     allow_multi_value_attributes = false
+#     blocking_timeout             = 5000
+#     connection_url               = "jdbc:hsqldb:$${pf.server.data.dir}$${/}hypersonic$${/}ProvisionerDefaultDB;hsqldb.lock_file=false"
+#     connection_url_tags = [
+#       {
+#         connection_url = "jdbc:hsqldb:$${pf.server.data.dir}$${/}hypersonic$${/}ProvisionerDefaultDB;hsqldb.lock_file=false"
+#         default_source = true
+#         tags           = null
+#       },
+#     ]
+#     driver_class = "org.hsqldb.jdbcDriver"
+#     # encrypted_password      = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2Iiwia2lkIjoiTkd3bk5NbkRyYyIsInZlcnNpb24iOiIxMi4yLjIuMCJ9..QeBqnwTDsC6GpF2VGP7H4w.u2RSnEkZYpMNOmcHaQDPNg.u4j97uP1KOXyPjtbdBMhvA"
+#     idle_timeout            = 5
+#     max_pool_size           = 100
+#     min_pool_size           = 10
+#     name                    = "ProvisionerDS (sa)"
+#     password                = var.provisioner_ds_password
+#     user_name               = "sa"
+#     validate_connection_sql = null
+#   }
+#   ldap_data_store                  = null
+#   mask_attribute_values            = false
+#   ping_one_ldap_gateway_data_store = null
+# }
 
 # Resource Type: pingfederate_oauth_ciba_server_policy_settings
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
