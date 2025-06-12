@@ -609,32 +609,33 @@ resource "pingfederate_session_application_policy" "pingcli__Session-0020-Applic
   max_timeout_mins  = 480
 }
 
-# Resource Type: pingfederate_keypairs_ssl_server_settings
-# Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
-import {
-  to = pingfederate_keypairs_ssl_server_settings.pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings
-  id = "keypairs_ssl_server_settings_singleton_id"
-}
+# # Resource Type: pingfederate_keypairs_ssl_server_settings
+# # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
+# import {
+#   to = pingfederate_keypairs_ssl_server_settings.pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings
+#   id = "keypairs_ssl_server_settings_singleton_id"
+# }
 
-# __generated__ by Terraform from "keypairs_ssl_server_settings_singleton_id"
-resource "pingfederate_keypairs_ssl_server_settings" "pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings" {
-  active_admin_console_certs = [
-    {
-      id = "4lbj1pas49dbbaohbih3hy1eq"
-    },
-  ]
-  active_runtime_server_certs = [
-    {
-      id = "4lbj1pas49dbbaohbih3hy1eq"
-    },
-  ]
-  admin_console_cert_ref = {
-    id = "4lbj1pas49dbbaohbih3hy1eq"
-  }
-  runtime_server_cert_ref = {
-    id = "4lbj1pas49dbbaohbih3hy1eq"
-  }
-}
+# TODO: update with reference to dependency of keypair that gets created via TF
+# # __generated__ by Terraform from "keypairs_ssl_server_settings_singleton_id"
+# resource "pingfederate_keypairs_ssl_server_settings" "pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings" {
+#   active_admin_console_certs = [
+#     {
+#       id = "4lbj1pas49dbbaohbih3hy1eq"
+#     },
+#   ]
+#   active_runtime_server_certs = [
+#     {
+#       id = "4lbj1pas49dbbaohbih3hy1eq"
+#     },
+#   ]
+#   admin_console_cert_ref = {
+#     id = "4lbj1pas49dbbaohbih3hy1eq"
+#   }
+#   runtime_server_cert_ref = {
+#     id = "4lbj1pas49dbbaohbih3hy1eq"
+#   }
+# }
 
 # Resource Type: pingfederate_oauth_token_exchange_generator_settings
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
