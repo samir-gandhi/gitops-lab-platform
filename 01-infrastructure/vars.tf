@@ -28,9 +28,11 @@ locals {
 
 variable "pingfederate_api_username" {
   default = "administrator"
+  type    = string
 }
 
 variable "pingfederate_api_password" {
   default   = "2FederateM0re"
   sensitive = true
+  type      = string
 }
