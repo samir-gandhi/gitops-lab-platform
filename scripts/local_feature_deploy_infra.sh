@@ -33,18 +33,23 @@ exit_usage()
     exit 1
 }
 
-while ! test -z ${1} ; do
+while [ $# -gt 0 ]; do
   case "${1}" in
     -d|--destroy)
-      _command="destroy" ;;
+      _command="destroy" 
+      ;;
     -g|--generate)
-      _command="plan -generate-config-out=generated-infrastructure.tf" ;;
+      _command="plan -generate-config-out=generated-infrastructure.tf" 
+      ;;
     -v|--verbose)
-      set -x ;;
+      set -x 
+      ;;
     -h|--help)
-      exit_usage "" ;;
+      exit_usage "" 
+      ;;
     *)
-      exit_usage "Unrecognized Option" ;;
+      exit_usage "Unrecognized Option: ${1}" 
+      ;;
   esac
   shift
 done
@@ -107,7 +112,7 @@ terraform -chdir="${TFDIR}" init -migrate-state \
   -backend-config="key=${_key}"
 
 ## terraform command
-echo "Running terraform apply for branch: ${_branch}, You will be prompted to enter the required variables."
+echo "Running terraform ${_command} for branch: ${_branch}, You will be prompted to enter the required variables."
 terraform -chdir="${TFDIR}" ${_command}
 
 # ## Create demo user unless destroy command is passed

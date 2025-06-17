@@ -96,6 +96,12 @@ variable "tf_state_key_prefix_infrastructure" {
   default     = "infrastructure-state"
 }
 
+variable "demo_user_sample_password" {
+  type        = string
+  description = "Password for the demo user sample"
+  default     = "2FederateL3ss!"
+}
+
 locals {
   # The URL of the demo app
   redirect_uris = ["${var.app_url}/dashboard.html"]
