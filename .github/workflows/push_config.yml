@@ -178,7 +178,7 @@ jobs:
           -backend-config="region=$TF_VAR_tf_state_region" \
           -backend-config="key=${_stateKey}"
         echo "***Running terraform apply***"
-        terraform -chdir=${_tfdir} apply --auto-approve
+        terraform -chdir=${_tfdir} apply --auto-approves
     - name: Replicate PingFederation Configuration
       run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
@@ -191,3 +191,4 @@ jobs:
           -H "Content-Type: application/json" \
           -H "X-XSRF-Header: $(date +%s)" \
           -u "${TF_VAR_pingfederate_api_username}:${TF_VAR_pingfederate_api_password}"
+          
