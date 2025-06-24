@@ -47,10 +47,17 @@ resource "helm_release" "ping_devops" {
     name  = "pingfederate-engine.envs.SERVER_PROFILE_BRANCH"
     value = var.k8s_helm_deployment_name
   }
+
+  set {
+    name  = "pingdirectory.envs.PING_IDENTITY_PASSWORD"
+    value = var.pingfederate_api_password
+  }
+
   set {
     name  = "pingdirectory.envs.SERVER_PROFILE_BRANCH"
     value = var.k8s_helm_deployment_name
   }
+  
   set {
     name  = "pingdataconsole.envs.SERVER_PROFILE_BRANCH"
     value = var.k8s_helm_deployment_name
