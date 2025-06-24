@@ -13,7 +13,6 @@ on:
       - .github/workflows/push_infra.yml
       - .github/workflows/drift_check.yml
 
-
 jobs:
   fmt:
     runs-on: ubuntu-latest

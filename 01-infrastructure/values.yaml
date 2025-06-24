@@ -4,7 +4,7 @@ global:
   
   ingress:
     enabled: true
-    addReleaseNameToHost: append
+    addReleaseNameToHost: prepend
     defaultDomain: ping-devops.com
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
@@ -21,18 +21,28 @@ pingfederate-admin:
   envs:
     SERVER_PROFILE_URL: https://github.com/samir-gandhi/gitops-lab-platform.git
     SERVER_PROFILE_PATH: server-profiles/pingfederate
-
-  ingress:
-    enabled: true
-  
   container:
-    resources:
-      requests:
-        cpu: 1
-        memory: 3Gi
-      limits:
-        cpu: 2
-        memory: 5Gi
+    # resources:
+    #   requests:
+    #     cpu: 1
+    #     memory: 3Gi
+    #   limits:
+    #     cpu: 2
+    #     memory: 5Gi
+    waitFor:
+      pingdirectory:
+        service: ldaps
+  workload:
+    type: StatefulSet
+    statefulSet:
+      persistentvolume:
+        volumes:
+          out-dir:
+            mountPath: /opt/out/instance/server/default/data
+            persistentVolumeClaim:
+              resources:
+                requests:
+                  storage: 8Gi
 
 #############################################################
 # pingfederate-engine values
@@ -44,6 +54,10 @@ pingfederate-engine:
     SERVER_PROFILE_PATH: server-profiles/pingfederate
   container:
     replicaCount: 1
+    waitFor:
+      pingfederate-admin:
+        service: https
+
     # resources:
     #   requests:
     #     cpu: 1
@@ -55,8 +69,8 @@ pingfederate-engine:
 pingdirectory:
   enabled: true
   envs:
-    SERVER_PROFILE_URL: https://github.com/pingidentity/pingidentity-server-profiles.git
-    SERVER_PROFILE_PATH: baseline/pingdirectory
+    SERVER_PROFILE_URL: https://github.com/samir-gandhi/gitops-lab-platform.git
+    SERVER_PROFILE_PATH: server-profiles/pingdirectory
 
   persistentvolume:
     enabled: true
@@ -68,5 +82,5 @@ pingdirectory:
 pingdataconsole:
   enabled: true
   envs:
-    SERVER_PROFILE_URL: https://github.com/pingidentity/pingidentity-server-profiles.git
-    SERVER_PROFILE_PATH: baseline/pingdirectory
+    SERVER_PROFILE_URL: https://github.com/samir-gandhi/gitops-lab-platform.git
+    SERVER_PROFILE_PATH: server-profiles/pingdirectory

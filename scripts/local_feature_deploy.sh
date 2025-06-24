@@ -31,18 +31,26 @@ exit_usage()
     exit 1
 }
 
-while ! test -z ${1} ; do
+while [ $# -gt 0 ]; do
   case "${1}" in
+    --clean)
+      _clean="true"
+      ;;
     -d|--destroy)
-      _command="destroy" ;;
+      _command="destroy" 
+      ;;
     -g|--generate)
-      _command="plan -generate-config-out=generated-platform.tf" ;;
+      _command="plan -generate-config-out=generated-platform.tf" 
+      ;;
     -v|--verbose)
-      set -x ;;
+      set -x 
+      ;;
     -h|--help)
-      exit_usage "" ;;
+      exit_usage "" 
+      ;;
     *)
-      exit_usage "Unrecognized Option" ;;
+      exit_usage "Unrecognized Option: ${1}" 
+      ;;
   esac
   shift
 done
@@ -71,6 +79,11 @@ _bucket_name="${TF_VAR_tf_state_bucket}"
 _region="${TF_VAR_tf_state_region}"
 _key="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
 
+if ${_clean} ; then
+  echo "Cleaning up old terraform state files..."
+  rm -rf "${TFDIR}/.terraform" "${TFDIR}/terraform.tfstate"
+fi
+
 ## terraform init
 terraform -chdir="${TFDIR}" init -migrate-state \
   -backend-config="bucket=${_bucket_name}" \
@@ -79,7 +92,7 @@ terraform -chdir="${TFDIR}" init -migrate-state \
 
 ## terraform apply
 
-echo "Running terraform apply for branch: ${_branch}, You will be prompted to enter the required variables."
+echo "Running terraform ${_command} for branch: ${_branch}, You will be prompted to enter the required variables."
 
 export TF_VAR_pingone_environment_name="${_branch}"
 

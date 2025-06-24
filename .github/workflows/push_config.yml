@@ -11,7 +11,6 @@ on:
       - .github/workflows/push_config.yml
       - .github/workflows/drift_check.yml
 
-
 jobs:
   fmt:
     runs-on: ubuntu-latest
@@ -186,7 +185,7 @@ jobs:
         source tfvars
         _tfdir=02-configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
-        _host="https://pingfederate-admin-${_branch}.ping-devops.com"
+        _host="https://${_branch}-pingfederate-admin.ping-devops.com"
         _uri="/pf-admin-api/v1/cluster/replicate"
         curl -k -X POST "${_host}${_uri}" \
           -H "Content-Type: application/json" \

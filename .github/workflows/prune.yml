@@ -23,7 +23,7 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: Terraform Destroy
+    - name: Destroy Configuration
       run: |-
         mkdir ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
@@ -36,19 +36,30 @@ jobs:
         _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        for _tfdir in "02-configuration" "01-infrastructure"; do
-          case "${_tfdir}" in
-            "02-configuration")
-              _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
-              ;;
-            "01-infrastructure")
-              _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
-              ;;
-          esac
-          echo "${_stateKey}"
-          terraform -chdir=${_tfdir} init \
-          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-          -backend-config="region=$TF_VAR_tf_state_region" \
-          -backend-config="key=${_stateKey}"
-          terraform -chdir=${_tfdir} destroy --auto-approve
-        done
+        _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
+        terraform -chdir=${_tfdir} init \ 
+        -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+        -backend-config="region=$TF_VAR_tf_state_region" \
+        -backend-config="key=${_stateKey}"
+        terraform -chdir=${_tfdir} destroy --auto-approve
+
+    - name: Destroy Infrastructure
+      continue-on-error: true
+      run: |-
+        mkdir ${HOME}/.kube
+        echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
+        kubectl version
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        echo "base: ${GITHUB_BASE_REF}"
+        echo "ref: ${{ github.event.ref }}"
+        _ref=$(echo "${{ github.event.ref }}" | sed -e "s#refs/heads/##g")
+        _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
+        export TF_VAR_pingone_environment_name="${_branch}"
+        export TF_VAR_k8s_helm_deployment_name="${_branch}"
+        _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
+        terraform -chdir=${_tfdir} init \
+        -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+        -backend-config="region=$TF_VAR_tf_state_region" \
+        -backend-config="key=${_stateKey}"
+        terraform -chdir=${_tfdir} destroy --auto-approve

@@ -10,7 +10,7 @@ variable "ping_devops_chart_version" {
 
 variable "pingdirectory_enabled" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "ping_identity_devops_key" {
@@ -24,4 +24,15 @@ variable "ping_identity_devops_user" {
 
 locals {
   k8s_deployment_namespace = "gitops-lab-${var.k8s_helm_deployment_name}"
+}
+
+variable "pingfederate_api_username" {
+  default = "administrator"
+  type    = string
+}
+
+variable "pingfederate_api_password" {
+  default   = "2FederateM0re"
+  sensitive = true
+  type      = string
 }

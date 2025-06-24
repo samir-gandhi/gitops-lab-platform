@@ -9,7 +9,9 @@ glitchenv*
 generated
 imports.tf
 generated-platform.tf
+copilot-instructions.md
 global.js
+*kubeconfig*
 
 # Local .terraform directories
 **/.terraform/*
