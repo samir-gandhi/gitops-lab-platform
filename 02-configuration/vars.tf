@@ -110,6 +110,12 @@ locals {
   # access_token = local.raw_data.access_token
 }
 
+variable "user_base_dn" {
+  description = "The base DN for users in PingDirectory"
+  type        = string
+  default     = "dc=example,dc=com"
+}
+
 # variable "provisioner_ds_password" {
 #   type    = string
 #   default = "secretpass"

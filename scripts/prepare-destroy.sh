@@ -1,7 +1,24 @@
 #!/bin/bash
 
-# Script to revert SSL server certificate configuration in PingFederate
+# Script to revert SSL server certificate configuration in PingFederate - 
+# TODO: Remove when CDI-534 is resolved
 # This sets the automatically generated certificate as the active/default one
+# Also handles retrieval and optional deletion of OAuth clients
+
+# Parse command line arguments
+FORCE_DELETE=false
+for arg in "$@"
+do
+    case $arg in
+        --force)
+            FORCE_DELETE=true
+            shift # Remove --force from processing
+            ;;
+        *)
+            # Unknown option
+            ;;
+    esac
+done
 
 # Source the lib.sh to get common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -105,6 +122,8 @@ fi
 # Optional: Skip SSL verification for self-signed certs in dev environments
 CURL_SSL_OPTS="--insecure"
 
+# ============== SSL Certificate Handling ==============
+
 echo "Step 1: Getting list of SSL server certificates"
 ssl_keys_response=$(curl ${CURL_SSL_OPTS} -s -X 'GET' \
   "${pfHost}/pf-admin-api/v1/keyPairs/sslServer" \
@@ -188,3 +207,148 @@ echo "SSL settings update response:"
 echo "$update_response" | jq .
 
 echo "Successfully reverted SSL certificate configuration to use auto-generated certificate"
+
+# ============== OAuth Client Handling ==============
+
+echo -e "\n===== OAuth Client Management ====="
+echo "Step 1: Getting list of OAuth clients"
+
+# Get list of OAuth clients
+clients_response=$(curl ${CURL_SSL_OPTS} -s -X 'GET' \
+  "${pfHost}/pf-admin-api/v1/oauth/clients" \
+  -H 'accept: application/json' \
+  -H 'X-XSRF-Header: PingFederate' \
+  ${AUTH_HEADER})
+
+# Check if the curl command was successful
+if [[ $? -ne 0 ]]; then
+  echo "Error: Failed to retrieve OAuth clients"
+  exit 1
+fi
+
+# Extract client IDs and names
+client_count=$(echo "$clients_response" | jq -r '.items | length')
+echo "Found $client_count OAuth clients:"
+
+# Print client info
+echo "$clients_response" | jq -r '.items[] | "- ID: \(.clientId) | Name: \(.name) | Enabled: \(.enabled)"'
+
+# Handle client deletion
+if [[ "$FORCE_DELETE" == "true" ]]; then
+  echo -e "\nForce flag detected. Proceeding with automatic deletion of all OAuth clients."
+  
+  # Loop through each client and delete
+  echo "$clients_response" | jq -r '.items[].clientId' | while read -r client_id; do
+    echo "Deleting OAuth client with ID: $client_id"
+    curl ${CURL_SSL_OPTS} -s -X 'DELETE' \
+      "${pfHost}/pf-admin-api/v1/oauth/clients/${client_id}" \
+      -H 'accept: application/json' \
+      -H 'X-XSRF-Header: PingFederate' \
+      ${AUTH_HEADER} > /dev/null
+      
+    if [[ $? -ne 0 ]]; then
+      echo "  Error: Failed to delete client $client_id"
+    else
+      echo "  Successfully deleted client $client_id"
+    fi
+  done
+  
+  echo "All OAuth clients have been deleted."
+else
+  # Interactive mode
+  echo -e "\nTo delete OAuth clients, you can:"
+  echo "1. Rerun this script with the --force flag to delete all clients"
+  echo "2. Delete individual clients manually using the API"
+  
+  # Ask for confirmation
+  read -p "Would you like to delete all OAuth clients now? (y/n) " -n 1 -r
+  echo
+  
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "Proceeding with deletion of all OAuth clients."
+    
+    # Loop through each client and delete
+    echo "$clients_response" | jq -r '.items[].clientId' | while read -r client_id; do
+      echo "Deleting OAuth client with ID: $client_id"
+      curl ${CURL_SSL_OPTS} -X 'DELETE' \
+        "${pfHost}/pf-admin-api/v1/oauth/clients/${client_id}" \
+        -H 'accept: application/json' \
+        -H 'X-XSRF-Header: PingFederate' \
+        ${AUTH_HEADER} > /dev/null
+        
+      if [[ $? -ne 0 ]]; then
+        echo "  Error: Failed to delete client $client_id"
+      else
+        echo "  Successfully deleted client $client_id"
+      fi
+    done
+    
+    echo "All OAuth clients have been deleted."
+  else
+    echo "Skipping OAuth client deletion."
+  fi
+fi
+
+# ============== Config Store Cleanup ==============
+
+echo -e "\n===== Config Store Cleanup ====="
+echo "Step 1: Removing lingering configuration store items"
+
+# Account Linking Service LDAP Implementation - delete UserSearchBase
+echo "Cleaning up Account Linking Service LDAP Implementation configuration..."
+curl ${CURL_SSL_OPTS} -s -X 'DELETE' \
+  "${pfHost}/pf-admin-api/v1/configStore/org.sourceid.saml20.service.impl.AccountLinkingServiceLDAPImpl/UserSearchBase" \
+  -H 'accept: application/json' \
+  -H 'X-XSRF-Header: PingFederate' \
+  ${AUTH_HEADER}
+
+if [[ $? -ne 0 ]]; then
+  echo "  Warning: Failed to delete UserSearchBase from AccountLinkingServiceLDAPImpl (might already be removed)"
+else
+  echo "  Successfully removed UserSearchBase from AccountLinkingServiceLDAPImpl"
+fi
+
+# OAuth Auth Server Settings - empty the coreAttributes in persistentGrantContract
+echo "Cleaning up OAuth Auth Server Settings configuration..."
+
+# Step 1: Get the current OAuth Auth Server Settings
+echo "Getting current OAuth Auth Server Settings..."
+OAUTH_SETTINGS=$(curl ${CURL_SSL_OPTS} -s -X 'GET' \
+  "${pfHost}/pf-admin-api/v1/oauth/authServerSettings" \
+  -H 'accept: application/json' \
+  -H 'X-XSRF-Header: PingFederate' \
+  ${AUTH_HEADER})
+
+# Check if we got a response
+if [[ $? -ne 0 || -z "$OAUTH_SETTINGS" ]]; then
+  echo "  Warning: Failed to get OAuth Auth Server Settings"
+else
+  # Step 2: Check if persistentGrantContract exists and has coreAttributes
+  HAS_CORE_ATTRIBUTES=$(echo "$OAUTH_SETTINGS" | jq -r 'if (.persistentGrantContract.coreAttributes | length > 0) then "true" else "false" end')
+  
+  if [[ "$HAS_CORE_ATTRIBUTES" == "true" ]]; then
+    echo "  Found persistentGrantContract with coreAttributes, emptying the array..."
+    
+    # Step 3: Empty the coreAttributes array within persistentGrantContract
+    MODIFIED_SETTINGS=$(echo "$OAUTH_SETTINGS" | jq '.persistentGrantContract.coreAttributes = []')
+    
+    # Step 4: PUT the modified settings back
+    curl ${CURL_SSL_OPTS} -s -X 'PUT' \
+      "${pfHost}/pf-admin-api/v1/oauth/authServerSettings" \
+      -H 'accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -H 'X-XSRF-Header: PingFederate' \
+      ${AUTH_HEADER} \
+      -d "$MODIFIED_SETTINGS"
+    
+    if [[ $? -ne 0 ]]; then
+      echo "  Warning: Failed to update OAuth Auth Server Settings"
+    else
+      echo "  Successfully emptied coreAttributes in persistentGrantContract"
+    fi
+  else
+    echo "  No coreAttributes found in persistentGrantContract or persistentGrantContract doesn't exist"
+  fi
+fi
+
+echo -e "\nPreparation for destroy completed successfully."

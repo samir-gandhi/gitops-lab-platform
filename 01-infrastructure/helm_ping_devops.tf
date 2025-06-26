@@ -57,7 +57,7 @@ resource "helm_release" "ping_devops" {
     name  = "pingdirectory.envs.SERVER_PROFILE_BRANCH"
     value = var.k8s_helm_deployment_name
   }
-  
+
   set {
     name  = "pingdataconsole.envs.SERVER_PROFILE_BRANCH"
     value = var.k8s_helm_deployment_name

@@ -562,6 +562,26 @@ resource "pingfederate_authentication_policy_contract" "pingcli__simplecontract"
   name = "simplecontract"
 }
 
+resource "pingfederate_oauth_authentication_policy_contract_mapping" "simplecontract_mapping" {
+  attribute_contract_fulfillment = {
+    "USER_NAME" = {
+      source = {
+        type = "AUTHENTICATION_POLICY_CONTRACT"
+      }
+      value = "subject"
+    }
+    "USER_KEY" = {
+      source = {
+        type = "AUTHENTICATION_POLICY_CONTRACT"
+      }
+      value = "subject"
+    }
+  }
+  authentication_policy_contract_ref = {
+    id = pingfederate_authentication_policy_contract.pingcli__simplecontract.contract_id
+  }
+}
+
 # __generated__ by Terraform from "authz_req|apc.Zxp6N6W5PH9onACT|jwt"
 resource "pingfederate_oauth_access_token_mapping" "pingcli__authz_req-007C-apc-002E-Zxp6N6W5PH9onACT-007C-jwt_AUTHENTICATION_POLICY_CONTRACT" {
   access_token_manager_ref = {
