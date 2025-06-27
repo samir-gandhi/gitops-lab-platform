@@ -5,6 +5,7 @@ test -f scripts/lib.sh || {
   exit 1
 }
 _command="apply"
+_replicate=false
 
 usage ()
 {
@@ -20,6 +21,8 @@ Usage:
       Run terraform destroy instead of apply
     -g, --generate
       Generate terraform resources from import blocks
+    -r, --replicate
+      Replicate PingFederation configuration after terraform apply
 END_USAGE
 exit 99
 }
@@ -41,6 +44,9 @@ while [ $# -gt 0 ]; do
       ;;
     -g|--generate)
       _command="plan -generate-config-out=generated-platform.tf" 
+      ;;
+    -r|--replicate)
+      _replicate=true
       ;;
     -v|--verbose)
       set -x 
@@ -98,7 +104,29 @@ export TF_VAR_pingone_environment_name="${_branch}"
 
 terraform -chdir="${TFDIR}" ${_command}
 
-# ## Create demo user unless destroy command is passed
-# if test "${_command}" != "destroy" ; then
-#   sh scripts/create_demo_user.sh
-# fi
+## Replicate PingFederation Configuration if requested
+if [ "${_replicate}" = true ] && [ "${_command}" != "destroy" ]; then
+  echo "Replicating PingFederation configuration..."
+  
+  # Check if required credentials are available
+  if [ -z "${TF_VAR_pingfederate_api_username}" ] || [ -z "${TF_VAR_pingfederate_api_password}" ]; then
+    echo "PingFederate API credentials are not set. Please set TF_VAR_pingfederate_api_username and TF_VAR_pingfederate_api_password in your localsecrets file."
+    exit 1
+  fi
+  
+  _host="https://${_branch}-pingfederate-admin.ping-devops.com"
+  _uri="/pf-admin-api/v1/cluster/replicate"
+  
+  echo "Calling PingFederate replication endpoint at ${_host}${_uri}"
+  curl -k -X POST "${_host}${_uri}" \
+    -H "Content-Type: application/json" \
+    -H "X-XSRF-Header: $(date +%s)" \
+    -u "${TF_VAR_pingfederate_api_username}:${TF_VAR_pingfederate_api_password}"
+    
+  if [ $? -eq 0 ]; then
+    echo "PingFederation configuration replicated successfully."
+  else
+    echo "Failed to replicate PingFederation configuration."
+    exit 1
+  fi
+fi

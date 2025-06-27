@@ -1109,6 +1109,9 @@ resource "pingfederate_openid_connect_policy" "pingcli__pingaccess" {
 # __generated__ by Terraform from "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3"
 resource "pingfederate_data_store" "pingcli__LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3_LDAP" {
   data_store_id = "LDAP-D803C87FAB2ADFB4B0A947B64BA6F0C6093A5CA3"
+  lifecycle {
+    create_before_destroy = true
+  }
   ldap_data_store = {
     bind_anonymously      = false
     connection_timeout    = 3000
