@@ -2,6 +2,11 @@
 
 ## this holds the common functions used by other scripts ####
 
+# Set default namespace prefix if not already set
+if [ -z "${TF_VAR_k8s_namespace_prefix}" ]; then
+  export TF_VAR_k8s_namespace_prefix="ping-devops-"
+fi
+
 checkVars() {
   for var in \
   "${TF_VAR_pingone_client_id}" \

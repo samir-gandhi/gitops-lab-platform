@@ -7,6 +7,7 @@ test -f scripts/lib.sh || {
   exit 1
 }
 _command="apply"
+_auto_config=false
 
 usage ()
 {
@@ -22,6 +23,8 @@ Usage:
       Run terraform destroy instead of apply
     -g, --generate
       Generate terraform resources from import blocks
+    -c, --config
+      Run configuration deployment after infrastructure deployment
 END_USAGE
 exit 99
 }
@@ -40,6 +43,9 @@ while [ $# -gt 0 ]; do
       ;;
     -g|--generate)
       _command="plan -generate-config-out=generated-infrastructure.tf" 
+      ;;
+    -c|--config)
+      _auto_config=true
       ;;
     -v|--verbose)
       set -x 
@@ -114,8 +120,39 @@ terraform -chdir="${TFDIR}" init -migrate-state \
 ## terraform command
 echo "Running terraform ${_command} for branch: ${_branch}, You will be prompted to enter the required variables."
 terraform -chdir="${TFDIR}" ${_command}
+terraform_result=$?
 
-# ## Create demo user unless destroy command is passed
-# if test "${_command}" != "destroy" ; then
-#   sh scripts/create_demo_user.sh
-# fi
+# If infrastructure was successfully applied and auto-config is enabled, run configuration script
+if [ ${terraform_result} -eq 0 ] && [ "${_command}" = "apply" ] && [ "${_auto_config}" = true ]; then
+  echo "Infrastructure deployment successful. Waiting for services to initialize..."
+  sleep 30
+  
+  # Get the namespace with prefix
+  _namespace="${TF_VAR_k8s_namespace_prefix:-ping-devops-}${_branch}"
+  
+  # Verify PingFederate admin pod is running
+  echo "Verifying PingFederate admin pod status..."
+  kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=admin,app.kubernetes.io/instance="${_branch}-pingfederate" -n "${_namespace}" --timeout=180s
+  
+  if [ $? -eq 0 ]; then
+    echo "PingFederate admin pod is ready. Proceeding with configuration deployment..."
+    
+    # Run configuration deployment with restart and replicate options
+    echo "Running configuration deployment..."
+    ./scripts/local_feature_deploy.sh --restart-pod --replicate
+  else
+    echo "PingFederate admin pod is not ready. Skipping configuration deployment."
+    exit 1
+  fi
+fi
+
+# If infrastructure destroy was successful and auto-config is enabled, clean up S3 status files
+if [ ${terraform_result} -eq 0 ] && [ "${_command}" = "destroy" ]; then
+  if [ ! -z "${TF_VAR_tf_state_bucket}" ]; then
+    echo "Removing branch status files from S3..."
+    aws s3 rm "s3://${TF_VAR_tf_state_bucket}/branch_infra_status/${_branch}" --recursive || true
+  fi
+fi
+
+# Return the terraform command result
+exit ${terraform_result}
