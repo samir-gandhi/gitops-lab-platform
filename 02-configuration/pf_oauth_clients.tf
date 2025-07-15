@@ -1,6 +1,6 @@
 resource "pingfederate_oauth_client" "mySampleApp" {
-  client_id                     = "mySampleApp"
-  name                          = "mySampleApp"
+  client_id = "mySampleApp"
+  name      = "mySampleApp"
   client_auth = {
     secret = "myS@mpl3s3cr3t"
     type   = "SECRET"
@@ -17,17 +17,17 @@ resource "pingfederate_oauth_client" "mySampleApp" {
     pairwise_identifier_user_type               = false
     ping_access_logout_capable                  = false
   }
-  persistent_grant_expiration_type                = "SERVER_DEFAULT"
-  persistent_grant_idle_timeout                   = 0
-  persistent_grant_idle_timeout_time_unit         = "DAYS"
-  persistent_grant_idle_timeout_type              = "SERVER_DEFAULT"
-  persistent_grant_reuse_grant_types              = []
-  persistent_grant_reuse_type                     = "SERVER_DEFAULT"
-  redirect_uris                                   = []
-  refresh_rolling                                 = "SERVER_DEFAULT"
-  refresh_token_rolling_grace_period_type         = "SERVER_DEFAULT"
-  refresh_token_rolling_interval_type             = "SERVER_DEFAULT"
-  restricted_response_types                       = []
-  restricted_scopes                               = []
-  validate_using_all_eligible_atms                = true
+  persistent_grant_expiration_type        = "SERVER_DEFAULT"
+  persistent_grant_idle_timeout           = 0
+  persistent_grant_idle_timeout_time_unit = "DAYS"
+  persistent_grant_idle_timeout_type      = "SERVER_DEFAULT"
+  persistent_grant_reuse_grant_types      = []
+  persistent_grant_reuse_type             = "SERVER_DEFAULT"
+  redirect_uris                           = []
+  refresh_rolling                         = "SERVER_DEFAULT"
+  refresh_token_rolling_grace_period_type = "SERVER_DEFAULT"
+  refresh_token_rolling_interval_type     = "SERVER_DEFAULT"
+  restricted_response_types               = []
+  restricted_scopes                       = []
+  validate_using_all_eligible_atms        = true
 }
