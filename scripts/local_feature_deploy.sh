@@ -440,7 +440,7 @@ else
   fi
 
   # If terraform apply was successful and we need to replicate configuration
-  if [ "${_command}" = "apply" ]; then
+  if [ "${_command}" = "apply" ] && [ ${_integrated} = "true" ]; then
     # Always restart the pod after apply to ensure config is loaded properly
     echo "Restarting PingFederate admin pod after successful apply..."
     restart_pf_pod "${_branch}"

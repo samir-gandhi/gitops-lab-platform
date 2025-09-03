@@ -22,6 +22,8 @@ global.js
 *.tfstate.*
 **/.tfstate
 **/.tfstate.*
+terraform-apply.out
+terraform-debug.log
 
 # Crash log files
 crash.log

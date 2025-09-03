@@ -19,9 +19,10 @@ provider "davinci" {
   region         = var.pingone_davinci_admin_region
 }
 
+# Only resolve infrastructure remote state when integration is enabled
 data "terraform_remote_state" "infrastructure" {
+  count   = var.enable_infrastructure_integration ? 1 : 0
   backend = "s3"
-
   config = {
     bucket = var.tf_state_bucket
     region = var.tf_state_region
@@ -32,6 +33,14 @@ data "terraform_remote_state" "infrastructure" {
 locals {
   # Determine the infrastructure state key based on current environment
   infrastructure_state_key = contains(["prod", "qa"], var.pingone_environment_name) ? "${var.tf_state_key_prefix_infrastructure}/${var.pingone_environment_name}/terraform.tfstate" : "${var.tf_state_key_prefix_infrastructure}/dev/${var.pingone_environment_name}/terraform.tfstate"
+
+  # Safe access to infra outputs when enabled
+  infra_outputs = var.enable_infrastructure_integration ? data.terraform_remote_state.infrastructure[0].outputs : {}
+}
+
+## Temporary output for tflint, this variable will be used by P1 to PingFederate Configuration later. 
+output "name" {
+  value = local.infra_outputs
 }
 
 variable "tf_state_key_prefix_infrastructure" {
@@ -40,16 +49,7 @@ variable "tf_state_key_prefix_infrastructure" {
   default     = "infrastructure-state"
 }
 
-
-provider "pingfederate" {
-  # Configuration options
-  username                            = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_username
-  password                            = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
-  https_host                          = data.terraform_remote_state.infrastructure.outputs.pingfederate_admin_ingress_url
-  product_version                     = data.terraform_remote_state.infrastructure.outputs.pingfederate_product_version
-  x_bypass_external_validation_header = true
-  insecure_trust_all_tls              = true
-}
+# Removed root-level pingfederate provider; configured in pf_integration module
 
 provider "http" {
 }
@@ -89,4 +89,4 @@ provider "acme" {
 # │ Details:
 # │   - Code:     INVALID_VALUE
 # │     Message:  The certificate that is attached to your distribution was not issued by a trusted Certificate Authority. For more details, see: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html#alternate-domain-names-requirements
-# │ 
+# │
