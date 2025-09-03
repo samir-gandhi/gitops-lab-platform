@@ -90,16 +90,11 @@ variable "tf_state_region" {
   description = "AWS region for S3 bucket storing Terraform state"
 }
 
-variable "tf_state_key_prefix_infrastructure" {
-  type        = string
-  description = "Key prefix for infrastructure state files in S3"
-  default     = "infrastructure-state"
-}
-
-variable "demo_user_sample_password" {
-  type        = string
-  description = "Password for the demo user sample"
-  default     = "2FederateL3ss!"
+# Integration control and inputs
+variable "enable_infrastructure_integration" {
+  description = "Enable integration with infrastructure repo outputs"
+  type        = bool
+  default     = false
 }
 
 locals {
@@ -108,12 +103,6 @@ locals {
   # Worker app token variables
   # raw_data     = jsondecode(data.http.get_token.response_body)
   # access_token = local.raw_data.access_token
-}
-
-variable "user_base_dn" {
-  description = "The base DN for users in PingDirectory"
-  type        = string
-  default     = "dc=example,dc=com"
 }
 
 # variable "provisioner_ds_password" {

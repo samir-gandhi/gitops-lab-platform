@@ -65,7 +65,7 @@ echo "Using Terraform state key: ${TF_STATE_KEY}"
 echo "Using S3 bucket: ${S3_BUCKET}"
 
 # Get PingFederate admin URL from Terraform state
-PF_ADMIN_HOST=$(cd "${PROJECT_ROOT}/02-configuration" && \
+PF_ADMIN_HOST=$(cd "${PROJECT_ROOT}/configuration" && \
   AWS_PAGER="" aws s3 cp \
   "s3://${S3_BUCKET}/${TF_STATE_KEY}" - 2>/dev/null | \
   jq -r '.outputs.pingfederate_admin_ingress_url.value' 2>/dev/null)
@@ -101,12 +101,12 @@ if [[ ! -z "${TF_VAR_pingfederate_api_username}" && ! -z "${TF_VAR_pingfederate_
 else
   # Fallback to credentials from Terraform state if environment variables are not set
   echo "Environment variables not found. Attempting to get credentials from Terraform state..."
-  PF_ADMIN_USER=$(cd "${PROJECT_ROOT}/02-configuration" && \
+  PF_ADMIN_USER=$(cd "${PROJECT_ROOT}/configuration" && \
     AWS_PAGER="" aws s3 cp \
     "s3://gitlab-ping-devops-infra-tf-state/${TF_STATE_KEY}" - 2>/dev/null | \
     jq -r '.outputs.pingfederate_api_username.value' 2>/dev/null)
 
-  PF_ADMIN_PASS=$(cd "${PROJECT_ROOT}/02-configuration" && \
+  PF_ADMIN_PASS=$(cd "${PROJECT_ROOT}/configuration" && \
     AWS_PAGER="" aws s3 cp \
     "s3://gitlab-ping-devops-infra-tf-state/${TF_STATE_KEY}" - 2>/dev/null | \
     jq -r '.outputs.pingfederate_api_password.value' 2>/dev/null)

@@ -1,5 +1,5 @@
-DEV_DIR:=./02-configuration
-PINGCLI_VERSION=0.1.0
+DEV_DIR:=./configuration
+PINGCLI_VERSION=0.7.0
 default: devcheck
 
 fmt:

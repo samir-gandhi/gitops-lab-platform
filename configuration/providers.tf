@@ -19,6 +19,28 @@ provider "davinci" {
   region         = var.pingone_davinci_admin_region
 }
 
+data "terraform_remote_state" "infrastructure" {
+  backend = "s3"
+
+  config = {
+    bucket = var.tf_state_bucket
+    region = var.tf_state_region
+    key    = local.infrastructure_state_key
+  }
+}
+
+locals {
+  # Determine the infrastructure state key based on current environment
+  infrastructure_state_key = contains(["prod", "qa"], var.pingone_environment_name) ? "${var.tf_state_key_prefix_infrastructure}/${var.pingone_environment_name}/terraform.tfstate" : "${var.tf_state_key_prefix_infrastructure}/dev/${var.pingone_environment_name}/terraform.tfstate"
+}
+
+variable "tf_state_key_prefix_infrastructure" {
+  type        = string
+  description = "Key prefix for infrastructure state files in S3"
+  default     = "infrastructure-state"
+}
+
+
 provider "pingfederate" {
   # Configuration options
   username                            = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_username

@@ -21,10 +21,10 @@ resource "pingfederate_certificate_ca" "pingcli__CN-003D-dev-002C--0020-OU-003D-
 
 # Resource Type: pingfederate_keypairs_ssl_server_settings
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
-import {
-  to = pingfederate_keypairs_ssl_server_settings.pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings
-  id = "keypairs_ssl_server_settings_singleton_id"
-}
+# import {
+#   to = pingfederate_keypairs_ssl_server_settings.pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings
+#   id = "keypairs_ssl_server_settings_singleton_id"
+# }
 
 # __generated__ by Terraform from "keypairs_ssl_server_settings_singleton_id"
 resource "pingfederate_keypairs_ssl_server_settings" "pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings" {
@@ -48,10 +48,10 @@ resource "pingfederate_keypairs_ssl_server_settings" "pingcli__Keypairs-0020-Ssl
 
 # Resource Type: pingfederate_virtual_host_names
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
-import {
-  to = pingfederate_virtual_host_names.pingcli__Virtual-0020-Host-0020-Names
-  id = "virtual_host_names_singleton_id"
-}
+# import {
+#   to = pingfederate_virtual_host_names.pingcli__Virtual-0020-Host-0020-Names
+#   id = "virtual_host_names_singleton_id"
+# }
 
 # __generated__ by Terraform from "virtual_host_names_singleton_id"
 resource "pingfederate_virtual_host_names" "pingcli__Virtual-0020-Host-0020-Names" {
@@ -60,10 +60,10 @@ resource "pingfederate_virtual_host_names" "pingcli__Virtual-0020-Host-0020-Name
 
 # Resource Type: pingfederate_certificates_revocation_settings
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
-import {
-  to = pingfederate_certificates_revocation_settings.pingcli__Certificates-0020-Revocation-0020-Settings
-  id = "certificates_revocation_settings_singleton_id"
-}
+# import {
+#   to = pingfederate_certificates_revocation_settings.pingcli__Certificates-0020-Revocation-0020-Settings
+#   id = "certificates_revocation_settings_singleton_id"
+# }
 
 # __generated__ by Terraform from "certificates_revocation_settings_singleton_id"
 resource "pingfederate_certificates_revocation_settings" "pingcli__Certificates-0020-Revocation-0020-Settings" {
@@ -77,10 +77,10 @@ resource "pingfederate_certificates_revocation_settings" "pingcli__Certificates-
   proxy_settings = null
 }
 
-import {
-  to = pingfederate_server_settings.pingcli__Server-0020-Settings
-  id = "server_settings_singleton_id"
-}
+# import {
+#   to = pingfederate_server_settings.pingcli__Server-0020-Settings
+#   id = "server_settings_singleton_id"
+# }
 
 # __generated__ by Terraform from "server_settings_singleton_id"
 resource "pingfederate_server_settings" "pingcli__Server-0020-Settings" {
@@ -116,10 +116,10 @@ resource "pingfederate_server_settings" "pingcli__Server-0020-Settings" {
   }
 }
 
-import {
-  to = pingfederate_oauth_access_token_manager_settings.pingcli__Oauth-0020-Access-0020-Token-0020-Manager-0020-Settings
-  id = "oauth_access_token_manager_settings_singleton_id"
-}
+# import {
+#   to = pingfederate_oauth_access_token_manager_settings.pingcli__Oauth-0020-Access-0020-Token-0020-Manager-0020-Settings
+#   id = "oauth_access_token_manager_settings_singleton_id"
+# }
 
 # __generated__ by Terraform from "oauth_access_token_manager_settings_singleton_id"
 resource "pingfederate_oauth_access_token_manager_settings" "pingcli__Oauth-0020-Access-0020-Token-0020-Manager-0020-Settings" {
@@ -130,10 +130,10 @@ resource "pingfederate_oauth_access_token_manager_settings" "pingcli__Oauth-0020
 
 # Resource Type: pingfederate_authentication_policies_settings
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
-import {
-  to = pingfederate_authentication_policies_settings.pingcli__Authentication-0020-Policies-0020-Settings
-  id = "authentication_policies_settings_singleton_id"
-}
+# import {
+#   to = pingfederate_authentication_policies_settings.pingcli__Authentication-0020-Policies-0020-Settings
+#   id = "authentication_policies_settings_singleton_id"
+# }
 
 # __generated__ by Terraform from "authentication_policies_settings_singleton_id"
 resource "pingfederate_authentication_policies_settings" "pingcli__Authentication-0020-Policies-0020-Settings" {
@@ -657,10 +657,10 @@ resource "pingfederate_oauth_access_token_mapping" "pingcli__authz_req-007C-apc-
 
 # Resource Type: pingfederate_openid_connect_settings
 # Singleton ID: This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform.
-import {
-  to = pingfederate_openid_connect_settings.pingcli__Openid-0020-Connect-0020-Settings
-  id = "openid_connect_settings_singleton_id"
-}
+# import {
+#   to = pingfederate_openid_connect_settings.pingcli__Openid-0020-Connect-0020-Settings
+#   id = "openid_connect_settings_singleton_id"
+# }
 # # __generated__ by Terraform from "openid_connect_settings_singleton_id"
 resource "pingfederate_openid_connect_settings" "pingcli__Openid-0020-Connect-0020-Settings" {
   default_policy_ref = {
