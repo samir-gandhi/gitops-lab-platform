@@ -439,7 +439,7 @@ else
     exit ${terraform_exit_code}
   fi
 
-  # If terraform apply was successful and we need to replicate configuration
+  # If terraform apply was successful and we are on an integrated branch we need to replicate configuration
   if [ "${_command}" = "apply" ] && [ ${_integrated} = "true" ]; then
     # Always restart the pod after apply to ensure config is loaded properly
     echo "Restarting PingFederate admin pod after successful apply..."

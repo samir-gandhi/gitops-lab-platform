@@ -43,6 +43,17 @@ output "name" {
   value = local.infra_outputs
 }
 
+
+provider "pingfederate" {
+  # Configuration options
+  username                            = data.terraform_remote_state.infrastructure[0].outputs.pingfederate_api_username
+  password                            = data.terraform_remote_state.infrastructure[0].outputs.pingfederate_api_password
+  https_host                          = data.terraform_remote_state.infrastructure[0].outputs.pingfederate_admin_ingress_url
+  product_version                     = data.terraform_remote_state.infrastructure[0].outputs.pingfederate_product_version
+  x_bypass_external_validation_header = true
+  insecure_trust_all_tls              = true
+}
+
 variable "tf_state_key_prefix_infrastructure" {
   type        = string
   description = "Key prefix for infrastructure state files in S3"
