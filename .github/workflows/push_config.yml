@@ -184,6 +184,8 @@ jobs:
     - name: Terraform Apply (first attempt)
       id: tf_apply_first
       run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
         _status_file=$(mktemp)
@@ -268,6 +270,8 @@ jobs:
       if: ${{ steps.tf_apply_first.outputs.needs_retry == 'true' }}
       id: tf_apply_retry
       run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
         _status_file=$(mktemp)
