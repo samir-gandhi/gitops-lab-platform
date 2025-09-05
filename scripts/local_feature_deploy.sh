@@ -151,66 +151,6 @@ replicate_pf_config() {
   fi
 }
 
-# Import singleton PingFederate resources into module state (first deploy only)
-import_pf_integration_state() {
-  echo "Importing PingFederate singleton resources into module state..."
-  FAIL=0
-  # Address-ID pairs, derived from prior import blocks
-  while read -r addr id; do
-    [ -z "$addr" ] && continue
-    if terraform -chdir="${TFDIR}" state show "$addr" >/dev/null 2>&1; then
-      echo "Already in state: $addr"
-      continue
-    fi
-    echo "terraform import $addr $id"
-    if ! terraform -chdir="${TFDIR}" import "$addr" "$id"; then
-      echo "WARN: Import failed for $addr"
-      FAIL=1
-      continue
-    fi
-  done <<'EOF_IMPORTS'
-module.pf_integration[0].pingfederate_keypairs_ssl_server_settings.pingcli__Keypairs-0020-Ssl-0020-Server-0020-Settings keypairs_ssl_server_settings_singleton_id
-module.pf_integration[0].pingfederate_virtual_host_names.pingcli__Virtual-0020-Host-0020-Names virtual_host_names_singleton_id
-module.pf_integration[0].pingfederate_certificates_revocation_settings.pingcli__Certificates-0020-Revocation-0020-Settings certificates_revocation_settings_singleton_id
-module.pf_integration[0].pingfederate_server_settings.pingcli__Server-0020-Settings server_settings_singleton_id
-module.pf_integration[0].pingfederate_oauth_access_token_manager_settings.pingcli__Oauth-0020-Access-0020-Token-0020-Manager-0020-Settings oauth_access_token_manager_settings_singleton_id
-module.pf_integration[0].pingfederate_authentication_policies_settings.pingcli__Authentication-0020-Policies-0020-Settings authentication_policies_settings_singleton_id
-module.pf_integration[0].pingfederate_openid_connect_settings.pingcli__Openid-0020-Connect-0020-Settings openid_connect_settings_singleton_id
-module.pf_integration[0].pingfederate_notification_publisher_settings.pingcli__Notification-0020-Publisher-0020-Settings notification_publisher_settings_singleton_id
-module.pf_integration[0].pingfederate_service_authentication.pingcli__Service-0020-Authentication service_authentication_singleton_id
-module.pf_integration[0].pingfederate_session_authentication_policies_global.pingcli__Session-0020-Authentication-0020-Policies-0020-Global session_authentication_policies_global_singleton_id
-module.pf_integration[0].pingfederate_oauth_ciba_server_policy_settings.pingcli__Oauth-0020-Ciba-0020-Server-0020-Policy-0020-Settings oauth_ciba_server_policy_settings_singleton_id
-module.pf_integration[0].pingfederate_session_settings.pingcli__Session-0020-Settings session_settings_singleton_id
-module.pf_integration[0].pingfederate_keypairs_oauth_openid_connect.pingcli__Keypairs-0020-Oauth-0020-Openid-0020-Connect keypairs_oauth_openid_connect_singleton_id
-module.pf_integration[0].pingfederate_authentication_policies.pingcli__Authentication-0020-Policies authentication_policies_singleton_id
-module.pf_integration[0].pingfederate_oauth_client_settings.pingcli__Oauth-0020-Client-0020-Settings oauth_client_settings_singleton_id
-module.pf_integration[0].pingfederate_server_settings_system_keys_rotate.pingcli__Server-0020-Settings-0020-System-0020-Keys-0020-Rotate server_settings_system_keys_rotate_singleton_id
-module.pf_integration[0].pingfederate_cluster_settings.pingcli__Cluster-0020-Settings cluster_settings_singleton_id
-module.pf_integration[0].pingfederate_extended_properties.pingcli__Extended-0020-Properties extended_properties_singleton_id
-module.pf_integration[0].pingfederate_captcha_provider_settings.pingcli__Captcha-0020-Provider-0020-Settings captcha_provider_settings_singleton_id
-module.pf_integration[0].pingfederate_authentication_api_settings.pingcli__Authentication-0020-Api-0020-Settings authentication_api_settings_singleton_id
-module.pf_integration[0].pingfederate_incoming_proxy_settings.pingcli__Incoming-0020-Proxy-0020-Settings incoming_proxy_settings_singleton_id
-module.pf_integration[0].pingfederate_configuration_encryption_keys_rotate.pingcli__Configuration-0020-Encryption-0020-Keys-0020-Rotate configuration_encryption_keys_rotate_singleton_id
-module.pf_integration[0].pingfederate_sp_target_url_mappings.pingcli__Sp-0020-Target-0020-Url-0020-Mappings sp_target_url_mappings_singleton_id
-module.pf_integration[0].pingfederate_oauth_server_settings.pingcli__Oauth-0020-Server-0020-Settings oauth_server_settings_singleton_id
-module.pf_integration[0].pingfederate_server_settings_general.pingcli__Server-0020-Settings-0020-General server_settings_general_singleton_id
-module.pf_integration[0].pingfederate_session_application_policy.pingcli__Session-0020-Application-0020-Policy session_application_policy_singleton_id
-module.pf_integration[0].pingfederate_oauth_token_exchange_generator_settings.pingcli__Oauth-0020-Token-0020-Exchange-0020-Generator-0020-Settings oauth_token_exchange_generator_settings_singleton_id
-module.pf_integration[0].pingfederate_server_settings_ws_trust_sts_settings.pingcli__Server-0020-Settings-0020-Ws-0020-Trust-0020-Sts-0020-Settings server_settings_ws_trust_sts_settings_singleton_id
-module.pf_integration[0].pingfederate_protocol_metadata_lifetime_settings.pingcli__Protocol-0020-Metadata-0020-Lifetime-0020-Settings protocol_metadata_lifetime_settings_singleton_id
-module.pf_integration[0].pingfederate_protocol_metadata_signing_settings.pingcli__Protocol-0020-Metadata-0020-Signing-0020-Settings protocol_metadata_signing_settings_singleton_id
-module.pf_integration[0].pingfederate_kerberos_realm_settings.pingcli__Kerberos-0020-Realm-0020-Settings kerberos_realm_settings_singleton_id
-module.pf_integration[0].pingfederate_redirect_validation.pingcli__Redirect-0020-Validation redirect_validation_singleton_id
-module.pf_integration[0].pingfederate_server_settings_logging.pingcli__Server-0020-Settings-0020-Logging server_settings_logging_singleton_id
-module.pf_integration[0].pingfederate_default_urls.pingcli__Default-0020-Urls default_urls_singleton_id
-EOF_IMPORTS
-
-  if [ "$FAIL" -ne 0 ]; then
-    echo "ERROR: One or more imports failed. Fix the environment and re-run; imports will be retried on next run."
-    exit 1
-  fi
-}
-
 exit_usage()
 {
     echo "$*"
@@ -330,19 +270,22 @@ if ${_clean} ; then
   rm -rf "${TFDIR}/.terraform" "${TFDIR}/terraform.tfstate"
 fi
 
+# Unified PingFederate stack generation (integrated only)
+_stack_tpl="${TFDIR}/pf_integration.stack.tpl"
+_stack_gen="${TFDIR}/pf_integration.stack.tf"
+if [ "${_integrated}" = true ]; then
+  if [ -f "${_stack_tpl}" ]; then
+    cp "${_stack_tpl}" "${_stack_gen}"
+  fi
+else
+  rm -f "${_stack_gen}" 2>/dev/null || true
+fi
+
 ## terraform init
 terraform -chdir="${TFDIR}" init -migrate-state \
   -backend-config="bucket=${_bucket_name}" \
   -backend-config="region=${_region}" \
   -backend-config="key=${_key}"
-
-# Perform imports for integrated branches (idempotent)
-if [ "${_integrated}" = true ]; then
-  # Disable filename globbing so [0] in module address is not expanded by the shell
-  set -f
-  import_pf_integration_state
-  set +f
-fi
 
 ## terraform apply/destroy with enhanced flow
 
@@ -401,8 +344,8 @@ else
   # For apply command
   echo "Running terraform ${_command} for branch: ${_branch}..."
   # Restart pod before apply if requested
-  if [ "${_restart_pod}" = true ]; then
-    echo "Restarting PingFederate admin pod before configuration apply..."
+  if [ "${_integrated}" = true ] && [ "${_restart_pod}" = true ]; then
+    echo "Restarting PingFederate admin pod before configuration apply (integrated branch)..."
     restart_pf_pod "${_branch}"
   fi
 

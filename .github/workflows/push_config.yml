@@ -13,9 +13,7 @@ on:
 
 jobs:
   fmt:
-    runs-on: ubuntu-latest
-    env:
-      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
+    runs-on: ubuntu-latest}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -23,22 +21,33 @@ jobs:
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         terraform fmt -recursive -check .
 
   lint:
     needs: [fmt]
     runs-on: ubuntu-latest
-    env:
-      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - uses: actions/checkout@v4
     - uses: terraform-linters/setup-tflint@v4
       name: Setup TFLint
       with:
         tflint_version: latest
-
     - name: tflint
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         echo "***Running terraform lint***"
         tflint --recursive
 
@@ -54,6 +63,13 @@ jobs:
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
     - run: |-
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _tfdir=configuration
@@ -90,6 +106,13 @@ jobs:
       uses: actions/checkout@v4
     - name: Configure AWS Credentials
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
@@ -208,8 +231,8 @@ jobs:
         needs_retry=false
         if [ ${terraform_exit_code} -ne 0 ] && echo "${_branch}" | grep -q '^int-' ; then
           if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out" && \
-             (grep -q "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out" || \
-              grep -qi "Result ID: server_error" "${_tfdir}/terraform-apply.out"); then
+            (grep -q "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out" || \
+            grep -qi "Result ID: server_error" "${_tfdir}/terraform-apply.out"); then
             needs_retry=true
           fi
         fi

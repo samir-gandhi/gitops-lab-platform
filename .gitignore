@@ -56,3 +56,5 @@ terraform.rc
 *.hcl
 simple-p1-reg-app/
 dv-p1-protect-reg-app/
+configuration/imports_pf_integration.generated.tf
+configuration/pf_integration.stack.tf

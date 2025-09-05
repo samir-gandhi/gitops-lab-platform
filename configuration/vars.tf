@@ -79,24 +79,6 @@ variable "lets_encrypt_email_address" {
   default = "samirgandhi@pingidentity.com"
 }
 
-# S3 backend configuration variables
-variable "tf_state_bucket" {
-  type        = string
-  description = "S3 bucket for Terraform state storage"
-}
-
-variable "tf_state_region" {
-  type        = string
-  description = "AWS region for S3 bucket storing Terraform state"
-}
-
-# Integration control and inputs
-variable "enable_infrastructure_integration" {
-  description = "Enable integration with infrastructure repo outputs"
-  type        = bool
-  default     = false
-}
-
 locals {
   # The URL of the demo app
   redirect_uris = ["${var.app_url}/dashboard.html"]
@@ -104,8 +86,3 @@ locals {
   # raw_data     = jsondecode(data.http.get_token.response_body)
   # access_token = local.raw_data.access_token
 }
-
-# variable "provisioner_ds_password" {
-#   type    = string
-#   default = "secretpass"
-# }
