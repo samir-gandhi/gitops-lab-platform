@@ -2,7 +2,7 @@ name: Feature Deploy Push
 on: 
   create:
     paths:
-      - 02-configuration/**/*
+      - configuration/**/*
       - .github/workflows/push_config.yml
       - .github/workflows/drift_check.yml
   push:
@@ -189,22 +189,8 @@ jobs:
         _tfdir=configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
-        case $_branch in
-          prod)
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/prod/terraform.tfstate"
-            ;;
-          qa)
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/qa/terraform.tfstate"
-            ;;
-          *)
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
-            ;;
-        esac
-        terraform -chdir=${_tfdir} init \
-          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-          -backend-config="region=$TF_VAR_tf_state_region" \
-          -backend-config="key=${_stateKey}"
-
+        ## set enable_infrastructure_integration based on branch name
+        export TF_VAR_enable_infrastructure_integration=$(contains(["int-", "prod", "qa"], _branch) && echo "true" || echo "false")
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
         _status_file=$(mktemp)
@@ -295,21 +281,6 @@ jobs:
         _tfdir=configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
-        case $_branch in
-          prod)
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/prod/terraform.tfstate"
-            ;;
-          qa)
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/qa/terraform.tfstate"
-            ;;
-          *)
-            _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
-            ;;
-        esac
-        terraform -chdir=${_tfdir} init \
-          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-          -backend-config="region=$TF_VAR_tf_state_region" \
-          -backend-config="key=${_stateKey}"
 
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
