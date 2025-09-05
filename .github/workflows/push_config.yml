@@ -190,7 +190,14 @@ jobs:
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         ## set enable_infrastructure_integration based on branch name
-        export TF_VAR_enable_infrastructure_integration=$(contains(["int-", "prod", "qa"], _branch) && echo "true" || echo "false")
+        case "${_branch}" in
+          int-*|prod|qa)
+            export TF_VAR_enable_infrastructure_integration="true"
+            ;;
+          *)
+            export TF_VAR_enable_infrastructure_integration="false"
+            ;;
+        esac
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
         _status_file=$(mktemp)
