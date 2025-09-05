@@ -33,14 +33,12 @@ data "terraform_remote_state" "infrastructure" {
 locals {
   # Determine the infrastructure state key based on current environment
   infrastructure_state_key = contains(["prod", "qa"], var.pingone_environment_name) ? "${var.tf_state_key_prefix_infrastructure}/${var.pingone_environment_name}/terraform.tfstate" : "${var.tf_state_key_prefix_infrastructure}/dev/${var.pingone_environment_name}/terraform.tfstate"
-
   # Safe access to infra outputs when enabled
-  infra_outputs = var.enable_infrastructure_integration ? data.terraform_remote_state.infrastructure[0].outputs : {}
 }
 
 ## Temporary output for tflint, this variable will be used by P1 to PingFederate Configuration later. 
-output "name" {
-  value = local.infra_outputs
+output "infrastructure_outputs" {
+  value = data.terraform_remote_state.infrastructure[0].outputs
 }
 
 
