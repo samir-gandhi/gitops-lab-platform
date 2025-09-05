@@ -69,3 +69,21 @@ import { to = module.pf_integration.pingfederate_kerberos_realm_settings.pingcli
 import { to = module.pf_integration.pingfederate_redirect_validation.pingcli__Redirect-0020-Validation id = "redirect_validation_singleton_id" }
 import { to = module.pf_integration.pingfederate_server_settings_logging.pingcli__Server-0020-Settings-0020-Logging id = "server_settings_logging_singleton_id" }
 import { to = module.pf_integration.pingfederate_default_urls.pingcli__Default-0020-Urls id = "default_urls_singleton_id" }
+
+# S3 backend configuration variables
+variable "tf_state_bucket" {
+  type        = string
+  description = "S3 bucket for Terraform state storage"
+}
+
+variable "tf_state_region" {
+  type        = string
+  description = "AWS region for S3 bucket storing Terraform state"
+}
+
+# Integration control and inputs
+variable "enable_infrastructure_integration" {
+  description = "Enable integration with infrastructure repo outputs"
+  type        = bool
+  default     = false
+}
