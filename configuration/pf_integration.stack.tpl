@@ -15,7 +15,9 @@ data "terraform_remote_state" "infrastructure" {
   }
 }
 
-locals { pf_outputs = data.terraform_remote_state.infrastructure.outputs }
+locals {
+  pf_outputs = data.terraform_remote_state.infrastructure.outputs
+}
 
 provider "pingfederate" {
   username        = local.pf_outputs.pingfederate_api_username
@@ -173,4 +175,3 @@ import {
 # S3 backend configuration variables
 variable "tf_state_bucket" { type = string }
 variable "tf_state_region" { type = string }
-variable "enable_infrastructure_integration" { type = bool default = false }

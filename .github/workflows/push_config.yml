@@ -7,7 +7,7 @@ on:
       - .github/workflows/drift_check.yml
   push:
     paths:
-      - 02-configuration/**/*
+      - configuration/**/*
       - .github/workflows/push_config.yml
       - .github/workflows/drift_check.yml
 

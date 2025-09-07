@@ -260,7 +260,6 @@ if [ "${_integrated}" = true ]; then
   fi
 
   echo "Integration mode enabled for branch: ${_branch}. Reading infra outputs..."
-  export TF_VAR_enable_infrastructure_integration=true
   export TF_VAR_state_bucket="${_bucket_name}"
   export TF_VAR_state_region="${_region}"
 fi
