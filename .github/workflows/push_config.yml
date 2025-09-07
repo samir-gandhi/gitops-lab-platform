@@ -229,7 +229,7 @@ jobs:
         rm -f "${_status_file}"
 
         needs_retry=false
-        if [ ${terraform_exit_code} -ne 0 ] && echo "${_branch}" | grep -q '^int-' ; then
+        if [ ${terraform_exit_code} -ne 0 ] && [ ${TF_VAR_enable_infrastructure_integration} = "true" ] ; then
           if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out" && \
             (grep -q "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out" || \
             grep -qi "Result ID: server_error" "${_tfdir}/terraform-apply.out"); then
