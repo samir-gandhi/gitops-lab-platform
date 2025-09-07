@@ -422,3 +422,5 @@ jobs:
           -H "Content-Type: application/json" \
           -H "X-XSRF-Header: $(date +%s)" \
           -u "${TF_VAR_pingfederate_api_username}:${TF_VAR_pingfederate_api_password}"
+
+          
