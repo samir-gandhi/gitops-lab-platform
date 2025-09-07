@@ -13,7 +13,7 @@ on:
 
 jobs:
   fmt:
-    runs-on: ubuntu-latest}
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -423,4 +423,3 @@ jobs:
           -H "X-XSRF-Header: $(date +%s)" \
           -u "${TF_VAR_pingfederate_api_username}:${TF_VAR_pingfederate_api_password}"
 
-          
