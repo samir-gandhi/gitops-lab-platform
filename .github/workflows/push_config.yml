@@ -223,23 +223,46 @@ jobs:
         esac
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
-        _status_file=$(mktemp)
-        { terraform -chdir="${_tfdir}" apply --auto-approve 2>&1; echo "$?" > "${_status_file}"; } | tee "${_tfdir}/terraform-apply.out"
-        terraform_exit_code=$(cat "${_status_file}")
-        rm -f "${_status_file}"
+        set -o pipefail
+        terraform -chdir="${_tfdir}" apply --auto-approve 2>&1 | tee "${_tfdir}/terraform-apply.out"
+        terraform_exit_code=${PIPESTATUS[0]}
 
         needs_retry=false
         if [ ${terraform_exit_code} -ne 0 ] && [ "${TF_VAR_enable_infrastructure_integration}" = "true" ] ; then
-          if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out" && \
-            (grep -qi "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out" || \
-            grep -qi "Result ID: server_error" "${_tfdir}/terraform-apply.out"); then
+          has_api_error=false
+          has_oauth_error=false
+          has_server_error=false
+
+          if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out"; then
+            has_api_error=true
+          fi
+          if grep -qi "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out"; then
+            has_oauth_error=true
+          fi
+          if grep -qi "Result ID: server_error" "${_tfdir}/terraform-apply.out"; then
+            has_server_error=true
+          fi
+
+          if $has_api_error && ( $has_oauth_error || $has_server_error ); then
             needs_retry=true
           fi
         fi
+              (grep -qi "Error summary: An error occurred while creating the OAuth Client" "$output_file" || \
+              grep -qi "Result ID: server_error" "$output_file"); then
+        echo "exit_code=${terraform_exit_code}" | tee -a "$GITHUB_OUTPUT"
+        echo "needs_retry=${needs_retry}" | tee -a "$GITHUB_OUTPUT"
+          fi
+          return 1
+        }
+
+        # Check if retry is needed after Terraform apply
+        needs_retry=false
+        if should_retry "${terraform_exit_code}" "${TF_VAR_enable_infrastructure_integration}" "${_tfdir}/terraform-apply.out"; then
+          needs_retry=true
+        fi
 
         echo "exit_code=${terraform_exit_code}" >> "$GITHUB_OUTPUT"
-        echo "needs_retry=${needs_retry}" >> "$GITHUB_OUTPUT"
-
+        echo "needs_retry=\"${needs_retry}\"" >> "$GITHUB_OUTPUT"
     - name: Setup Kubernetes config (retry path)
       if: ${{ steps.tf_apply_first.outputs.needs_retry == 'true' }}
       run: |
