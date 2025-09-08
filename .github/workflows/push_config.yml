@@ -224,21 +224,21 @@ jobs:
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
         _status_file=$(mktemp)
-        terraform -chdir="${_tfdir}" apply --auto-approve 2>&1; echo "$?" > "${_status_file}"; } | tee "${_tfdir}/terraform-apply.out"
+        { terraform -chdir="${_tfdir}" apply --auto-approve 2>&1; echo "$?" > "${_status_file}"; } | tee "${_tfdir}/terraform-apply.out"
         terraform_exit_code=$(cat "${_status_file}")
         rm -f "${_status_file}"
 
         needs_retry=false
-        if [ ${terraform_exit_code} -ne 0 ] && [ ${TF_VAR_enable_infrastructure_integration} = "true" ] ; then
+        if [ ${terraform_exit_code} -ne 0 ] && [ "${TF_VAR_enable_infrastructure_integration}" = "true" ] ; then
           if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out" && \
-            (grep -q "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out" || \
+            (grep -qi "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out" || \
             grep -qi "Result ID: server_error" "${_tfdir}/terraform-apply.out"); then
             needs_retry=true
           fi
         fi
 
-        echo "exit_code=${terraform_exit_code}" >> $GITHUB_OUTPUT
-        echo "needs_retry=${needs_retry}" >> $GITHUB_OUTPUT
+        echo "exit_code=${terraform_exit_code}" >> "$GITHUB_OUTPUT"
+        echo "needs_retry=${needs_retry}" >> "$GITHUB_OUTPUT"
 
     - name: Setup Kubernetes config (retry path)
       if: ${{ steps.tf_apply_first.outputs.needs_retry == 'true' }}
