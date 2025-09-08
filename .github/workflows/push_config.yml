@@ -224,7 +224,7 @@ jobs:
         export TF_IN_AUTOMATION=1
         export TF_CLI_ARGS_apply="-no-color -input=false"
         _status_file=$(mktemp)
-        { terraform -chdir="${_tfdir}" apply --auto-approve 2>&1; echo "$?" >"${_status_file}"; } | tee "${_tfdir}/terraform-apply.out"
+        terraform -chdir="${_tfdir}" apply --auto-approve 2>&1; echo "$?" > "${_status_file}"; } | tee "${_tfdir}/terraform-apply.out"
         terraform_exit_code=$(cat "${_status_file}")
         rm -f "${_status_file}"
 
