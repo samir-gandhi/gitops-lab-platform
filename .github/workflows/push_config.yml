@@ -258,7 +258,7 @@ jobs:
     
     ## Prepare kubernetes on all integrated branches
     - name: Setup Kubernetes config
-      if: ${{ steps.infra_status.outputs.integrated_branch == 'true' }}
+      if: ${{ steps.infra_status.outputs.integrated_branch == 'true' && steps.tf_apply_first.outputs.needs_retry == 'true'}}
       run: |
         mkdir -p ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
