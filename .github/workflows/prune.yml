@@ -11,7 +11,7 @@ jobs:
     if: ${{ !startsWith(github.event.ref, 'qa') || !startsWith(github.event.ref, 'prod')}}
     name: Destroy Feature Environment
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
@@ -22,44 +22,174 @@ jobs:
     - uses: hashicorp/setup-terraform@v3
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-    - name: Destroy Configuration
-      run: |-
-        mkdir ${HOME}/.kube
+    
+    - name: Setup Kubernetes
+      run: |
+        mkdir -p ${HOME}/.kube
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
         kubectl version
+        
+    - name: Prepare destroy environment
+      run: |
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        echo "base: ${GITHUB_BASE_REF}"
-        echo "ref: ${{ github.event.ref }}"
         _ref=$(echo "${{ github.event.ref }}" | sed -e "s#refs/heads/##g")
         _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
+        
+        # Set environment variables for scripts
+        export ENVIRONMENT_NAME="${_branch}"
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        _stateKey="${TF_VAR_tf_state_key_prefix_platform}/dev/${_branch}/terraform.tfstate"
-        terraform -chdir=${_tfdir} init \ 
-        -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-        -backend-config="region=$TF_VAR_tf_state_region" \
-        -backend-config="key=${_stateKey}"
-        terraform -chdir=${_tfdir} destroy --auto-approve
+        
+        # Run prepare-destroy.sh
+        echo "Running prepare-destroy.sh script..."
+        chmod +x ./scripts/prepare-destroy.sh
+        ./scripts/prepare-destroy.sh --force
 
-    - name: Destroy Infrastructure
+    - name: Destroy Configuration - First attempt
+      id: destroy_config_first
       continue-on-error: true
       run: |-
-        mkdir ${HOME}/.kube
-        echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
-        kubectl version
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        echo "base: ${GITHUB_BASE_REF}"
-        echo "ref: ${{ github.event.ref }}"
         _ref=$(echo "${{ github.event.ref }}" | sed -e "s#refs/heads/##g")
         _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/dev/${_branch}/terraform.tfstate"
+        _tfdir="02-configuration"
+        _stateKey="${TF_VAR_tf_state_key_prefix_platform:-platform-state}/dev/${_branch}/terraform.tfstate"
+        
         terraform -chdir=${_tfdir} init \
-        -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-        -backend-config="region=$TF_VAR_tf_state_region" \
-        -backend-config="key=${_stateKey}"
+          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+          -backend-config="region=$TF_VAR_tf_state_region" \
+          -backend-config="key=${_stateKey}"
+        
+        # First attempt at destroying configuration
+        echo "First attempt at destroying configuration..."
+        set +e
+        terraform -chdir=${_tfdir} destroy --auto-approve 2>&1 | tee destroy_output.log
+        TERRAFORM_EXIT_CODE=$?
+        set -e
+        
+        # Check if we got the specific error about resources being in use
+        grep -q "This resource is in use and cannot be deleted" destroy_output.log
+        RESOURCE_IN_USE=$?
+        
+        if [ $TERRAFORM_EXIT_CODE -ne 0 ]; then
+          if [ $RESOURCE_IN_USE -eq 0 ]; then
+            echo "Detected 'resource in use' error. Will restart PingFederate and retry."
+            exit 1
+          else
+            echo "ERROR: Terraform destroy failed with exit code $TERRAFORM_EXIT_CODE"
+            echo "This is not the expected 'resource in use' error. See the logs above for details."
+            exit $TERRAFORM_EXIT_CODE
+          fi
+        fi
+
+    - name: Restart PingFederate and retry configuration destroy
+      if: steps.destroy_config_first.outcome == 'failure'
+      run: |
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _ref=$(echo "${{ github.event.ref }}" | sed -e "s#refs/heads/##g")
+        _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
+        
+        # Set namespace prefix with default if not provided
+        K8S_NAMESPACE_PREFIX="${TF_VAR_k8s_namespace_prefix:-ping-devops-}"
+        NAMESPACE="${K8S_NAMESPACE_PREFIX}${_branch}"
+        
+        # Restart PingFederate admin pod
+        echo "Restarting PingFederate admin pod..."
+        PF_POD=$(kubectl get pods -n "${NAMESPACE}" | grep pingfederate-admin | awk '{print $1}')
+        if [ -n "${PF_POD}" ]; then
+          kubectl delete pod "${PF_POD}" -n "${NAMESPACE}"
+          echo "Waiting for pod to restart..."
+          
+          # Wait for pod to be restarted and ready in a loop with timeout
+          MAX_WAIT_SECONDS=180  # 3 minutes
+          INTERVAL=10  # check every 10 seconds
+          ELAPSED=0
+          READY=false
+          
+          while [ $ELAPSED -lt $MAX_WAIT_SECONDS ]; do
+            echo "Checking pod status (${ELAPSED}s elapsed)..."
+            
+            # Check if pod exists
+            PF_POD=$(kubectl get pods -n "${NAMESPACE}" | grep pingfederate-admin | awk '{print $1}')
+            if [ -z "${PF_POD}" ]; then
+              echo "Pod not yet recreated. Waiting..."
+              sleep $INTERVAL
+              ELAPSED=$((ELAPSED + INTERVAL))
+              continue
+            fi
+            
+            # Check for crash loop
+            RESTARTS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.containerStatuses[0].restartCount}')
+            if [ $RESTARTS -gt 1 ]; then
+              echo "ERROR: PingFederate admin pod is in a crash loop with ${RESTARTS} restarts."
+              kubectl describe pod "${PF_POD}" -n "${NAMESPACE}"
+              exit 1
+            fi
+            
+            # Check if ready
+            POD_STATUS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.phase}')
+            READY_STATUS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.containerStatuses[0].ready}')
+            
+            if [ "$POD_STATUS" = "Running" ] && [ "$READY_STATUS" = "true" ]; then
+              echo "PingFederate admin pod restarted successfully and is ready"
+              READY=true
+              # Wait a bit longer for services to fully initialize
+              sleep 20
+              break
+            fi
+            
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+          
+          if [ "$READY" != "true" ]; then
+            echo "ERROR: Timed out waiting for PingFederate admin pod to restart after ${MAX_WAIT_SECONDS} seconds"
+            kubectl describe pod "${PF_POD}" -n "${NAMESPACE}"
+            exit 1
+          fi
+        else
+          echo "PingFederate admin pod not found. It may have been already removed."
+        fi
+        
+        # Second attempt at destroying configuration
+        _tfdir="02-configuration"
+        _stateKey="${TF_VAR_tf_state_key_prefix_platform:-platform-state}/dev/${_branch}/terraform.tfstate"
+        
+        echo "Second attempt at destroying configuration..."
+        terraform -chdir=${_tfdir} init \
+          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+          -backend-config="region=$TF_VAR_tf_state_region" \
+          -backend-config="key=${_stateKey}"
+          
+        # No continue-on-error here - if it fails, the workflow should fail
         terraform -chdir=${_tfdir} destroy --auto-approve
+    
+    - name: Destroy Infrastructure
+      # Only continue on error if explicitly requested
+      continue-on-error: false
+      run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _ref=$(echo "${{ github.event.ref }}" | sed -e "s#refs/heads/##g")
+        _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
+        export TF_VAR_pingone_environment_name="${_branch}"
+        export TF_VAR_k8s_helm_deployment_name="${_branch}"
+        _tfdir="01-infrastructure"
+        _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure:-infrastructure-state}/dev/${_branch}/terraform.tfstate"
+        
+        terraform -chdir=${_tfdir} init \
+          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
+          -backend-config="region=$TF_VAR_tf_state_region" \
+          -backend-config="key=${_stateKey}"
+        
+        # If this fails, the workflow should fail
+        terraform -chdir=${_tfdir} destroy --auto-approve
+        
+        # Clean up S3 status files after successful destroy
+        echo "Cleaning up S3 status files..."
+        aws s3 rm "s3://$TF_VAR_tf_state_bucket/branch_infra_status/${_branch}" --recursive || true

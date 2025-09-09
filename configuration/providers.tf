@@ -19,16 +19,6 @@ provider "davinci" {
   region         = var.pingone_davinci_admin_region
 }
 
-provider "pingfederate" {
-  # Configuration options
-  username                            = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_username
-  password                            = data.terraform_remote_state.infrastructure.outputs.pingfederate_api_password
-  https_host                          = data.terraform_remote_state.infrastructure.outputs.pingfederate_admin_ingress_url
-  product_version                     = data.terraform_remote_state.infrastructure.outputs.pingfederate_product_version
-  x_bypass_external_validation_header = true
-  insecure_trust_all_tls              = true
-}
-
 provider "http" {
 }
 
@@ -67,4 +57,4 @@ provider "acme" {
 # │ Details:
 # │   - Code:     INVALID_VALUE
 # │     Message:  The certificate that is attached to your distribution was not issued by a trusted Certificate Authority. For more details, see: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html#alternate-domain-names-requirements
-# │ 
+# │

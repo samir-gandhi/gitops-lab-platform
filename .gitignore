@@ -12,6 +12,7 @@ generated-platform.tf
 copilot-instructions.md
 global.js
 *kubeconfig*
+@*
 
 # Local .terraform directories
 **/.terraform/*
@@ -21,6 +22,8 @@ global.js
 *.tfstate.*
 **/.tfstate
 **/.tfstate.*
+terraform-apply.out
+terraform-debug.log
 
 # Crash log files
 crash.log
@@ -53,3 +56,5 @@ terraform.rc
 *.hcl
 simple-p1-reg-app/
 dv-p1-protect-reg-app/
+configuration/imports_pf_integration.generated.tf
+configuration/pf_integration.stack.tf
