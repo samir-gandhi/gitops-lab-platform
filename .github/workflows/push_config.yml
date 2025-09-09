@@ -234,8 +234,11 @@ jobs:
           echo $? > "${exit_code_file}"
         ) | tee "${_tfdir}/terraform-apply.out"
         set -x
+        ##log exit code for debugging
+        echo "Terraform apply exit code: $(cat "${exit_code_file}")"
+        test "$(cat "${exit_code_file}")" -ne 0 && echo "Terraform apply failed"
         ## Catch specific errors for retry logic
-        if [ $(cat "${exit_code_file}") -ne 0 ] ; then
+        if [ "$(cat "${exit_code_file}")" -ne 0 ] ; then
           if [ "${integrated_branch}" = "true" ] ; then
             has_api_error=false
             has_oauth_error=false
