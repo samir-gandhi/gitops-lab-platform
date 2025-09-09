@@ -1,6 +1,6 @@
 resource "pingfederate_oauth_client" "mySampleApp" {
   client_id = "mySampleApp"
-  name      = "mySampleAppFoo"
+  name      = "mySampleApp"
   client_auth = {
     secret = "myS@mpl3s3cr3t"
     type   = "SECRET"
