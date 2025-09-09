@@ -2,8 +2,7 @@ name: Pull Request Validation
 on: 
   pull_request:
     paths:
-      - '02-configuration/**'
-      - '01-infrastructure/**'
+      - 'configuration/**'
       - '.github/**'
 
 jobs:
@@ -48,8 +47,8 @@ jobs:
     - name: TFLint
       run: |
         _branch="${GITHUB_BASE_REF}"
-        echo "***Running terraform lint on 02-configuration and 01-infrastructure directories***"
-        for _tfdir in "02-configuration" "01-infrastructure"; do
+        echo "***Running terraform lint on configuration directory***"
+        for _tfdir in "configuration"; do
           echo "Linting directory: ${_tfdir}"
           cd ${GITHUB_WORKSPACE}/${_tfdir}
           tflint
@@ -89,12 +88,12 @@ jobs:
             exit 1
         esac
         
-        # Validate both the configuration (02-configuration) and infrastructure (01-infrastructure) directories
-        for _tfdir in "02-configuration" "01-infrastructure"; do
+        # Validate both the configuration directory
+        for _tfdir in "configuration"; do
           echo "Validating directory: ${_tfdir}"
           
           # Set the appropriate state key based on directory
-          if [ "${_tfdir}" = "02-configuration" ]; then
+          if [ "${_tfdir}" = "configuration" ]; then
             _stateKey="${_configStateKey}"
           else
             _stateKey="${_infraStateKey}"
@@ -122,54 +121,6 @@ jobs:
         scan-type: 'config'
         hide-progress: false
         exit-code: '1'
-
-
-  tfplan-infra:
-    needs: [validate]
-    runs-on: ubuntu-latest
-    env:
-      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
-    steps:
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
-    - uses: hashicorp/setup-terraform@v3
-    - name: Setup Kubernetes access
-      run: |-
-        mkdir -p ${HOME}/.kube
-        echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
-        kubectl version
-    - name: Run Terraform Plan for Infrastructure
-      run: |-
-        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
-        source tfvars
-        _branch="${GITHUB_BASE_REF}"
-        export TF_VAR_pingone_environment_name="${_branch}"
-        export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        
-        # Set infrastructure state key based on branch
-        case "${_branch}" in
-          "prod")
-            _infraStateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/prod/terraform.tfstate"
-            ;;
-          "qa")
-            _infraStateKey="${TF_VAR_tf_state_key_prefix_infrastructure}/qa/terraform.tfstate"
-            ;;
-          *)
-            echo "ERROR: Unknown target branch: ${_branch}"
-            exit 1
-        esac
-        
-        # Plan infrastructure changes
-        _tfdir="01-infrastructure"
-        echo "Planning infrastructure changes for environment: ${_branch}"
-        
-        # Initialize and plan the directory
-        terraform -chdir=${_tfdir} init \
-          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-          -backend-config="region=$TF_VAR_tf_state_region" \
-          -backend-config="key=${_infraStateKey}"
-        echo "***Running terraform plan for ${_tfdir}***"
-        terraform -chdir=${_tfdir} plan -input=false
 
   tfplan-config:
     needs: [validate]
@@ -202,7 +153,7 @@ jobs:
         esac
         
         # Plan configuration changes
-        _tfdir="02-configuration"
+        _tfdir="configuration"
         echo "Planning configuration changes for environment: ${_branch}"
         
         # Initialize and plan the directory
