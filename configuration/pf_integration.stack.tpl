@@ -10,13 +10,15 @@ data "terraform_remote_state" "infrastructure" {
   backend = "s3"
   config = {
     bucket = var.tf_state_bucket
-    key    = "infrastructure-state/dev/${var.pingone_environment_name}/terraform.tfstate"
+    key    = "infrastructure-state/${local.config_key_path}/terraform.tfstate"
     region = var.tf_state_region
   }
 }
 
 locals {
   pf_outputs = data.terraform_remote_state.infrastructure.outputs
+  # if prod or qa then path is just `${var.pingone_environment_name}` otherwise path is `dev/${var.pingone_environment_name}`
+  config_key_path = contains(["prod", "qa"], var.pingone_environment_name) ? var.pingone_environment_name : "dev/${var.pingone_environment_name}"
 }
 
 provider "pingfederate" {
