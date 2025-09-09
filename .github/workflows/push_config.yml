@@ -228,25 +228,29 @@ jobs:
           stdbuf -oL terraform -chdir="${_tfdir}" apply --auto-approve -no-color -input=false 2>&1
           echo $? > "${exit_code_file}"
         ) | tee "${_tfdir}/terraform-apply.out"
-        if [ $(cat "${exit_code_file}") -ne 0 ] && [ "${TF_VAR_enable_infrastructure_integration}" = "true" ] ; then
-          has_api_error=false
-          has_oauth_error=false
-
-          if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out"; then
-            has_api_error=true
-          fi
-          if grep -qi "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out"; then
-            has_oauth_error=true
-          fi
-
-          if $has_api_error && $has_oauth_error ; then
-            needs_retry=true
+        set -x
+        ## Catch specific errors for retry logic
+        if [ $(cat "${exit_code_file}") -ne 0 ] ; then
+          if [ "${TF_VAR_enable_infrastructure_integration}" = "true" ] ; then
+            has_api_error=false
+            has_oauth_error=false
+            if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out"; then
+              has_api_error=true
+            fi
+            if grep -qi "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out"; then
+              has_oauth_error=true
+            fi
+            ## Retry only if both errors are present
+            if $has_api_error && $has_oauth_error ; then
+              echo "needs_retry=\"${needs_retry}\"" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           fi
         fi
-        echo "exit_code=${terraform_exit_code}"
-        echo "needs_retry=${needs_retry}"
-        echo "exit_code=${terraform_exit_code}" >> "$GITHUB_OUTPUT"
-        echo "needs_retry=\"${needs_retry}\"" >> "$GITHUB_OUTPUT"
+        ## Terraform has passed or non-retryable error
+        exit $(cat "${exit_code_file}")
+    
+    ## Prepare kubernetes on all integrated branches
     - name: Setup Kubernetes config (retry path)
       if: ${{ steps.tf_apply_first.outputs.integrated_branch == 'true' }}
       run: |
@@ -254,6 +258,7 @@ jobs:
         echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
         kubectl version
 
+    ## If retry needed, restart PF pod and reapply
     - name: Restart PingFederate admin pod (retry path)
       if: ${{ steps.tf_apply_first.outputs.needs_retry == 'true' }}
       run: |
