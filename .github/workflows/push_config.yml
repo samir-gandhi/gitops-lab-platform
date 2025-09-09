@@ -229,10 +229,8 @@ jobs:
         echo "needs_retry=false" >> "$GITHUB_OUTPUT"
         exit_code_file=$(mktemp)
         ## Capture output in file and print to stdout
-        (
-          stdbuf -oL terraform -chdir="${_tfdir}" apply --auto-approve -no-color -input=false 2>&1
-          echo $? > "${exit_code_file}"
-        ) | tee "${_tfdir}/terraform-apply.out"
+        stdbuf -oL terraform -chdir="${_tfdir}" apply --auto-approve -no-color -input=false 2>&1 | tee "${_tfdir}/terraform-apply.out"
+        echo "${PIPESTATUS[0]}" > "${exit_code_file}"
         set -x
         ##log exit code for debugging
         echo "Terraform apply exit code: $(cat "${exit_code_file}")"
