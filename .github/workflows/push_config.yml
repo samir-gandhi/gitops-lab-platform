@@ -256,7 +256,6 @@ jobs:
         ## Terraform has passed or non-retryable error
         exit $(cat "${exit_code_file}")
     
-    ## Prepare kubernetes on all integrated branches
     - name: Setup Kubernetes config
       if: ${{ steps.infra_status.outputs.integrated_branch == 'true' && steps.tf_apply_first.outputs.needs_retry == 'true'}}
       run: |
@@ -339,79 +338,7 @@ jobs:
           echo $? > "${exit_code_file}"
         ) | tee "${_tfdir}/terraform-apply.out"
         exit $(cat "${exit_code_file}")
-    # This always restarts the PF pod after successful apply, even if no retry. Likely not needed.
-    # - name: Restart PingFederate admin pod
-    #   if: ${{ steps.infra_status.outputs.integrated_branch == 'true' && ((steps.tf_apply_first.outputs.needs_retry != 'true' && steps.tf_apply_first.outcome == 'success') || (steps.tf_apply_first.outputs.needs_retry == 'true' && steps.tf_apply_retry.outcome == 'success')) }}
-    #   run: |
-    #     echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
-    #     source tfvars
-    #     _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
-        
-    #     # Set namespace prefix with default if not provided
-    #     K8S_NAMESPACE_PREFIX="${TF_VAR_k8s_namespace_prefix:-ping-devops-}"
-    #     NAMESPACE="${K8S_NAMESPACE_PREFIX}${_branch}"
-        
-    #     # Get pod name
-    #     PF_POD=$(kubectl get pods -n "${NAMESPACE}" | grep pingfederate-admin | awk '{print $1}')
-        
-    #     if [ -z "${PF_POD}" ]; then
-    #       echo "ERROR: PingFederate admin pod not found in namespace ${NAMESPACE}"
-    #       echo "The pod should exist after infrastructure deployment."
-    #       exit 1
-    #     fi
-        
-    #     echo "Found PingFederate admin pod: ${PF_POD}"
-    #     echo "Restarting PingFederate admin pod..."
-    #     kubectl delete pod "${PF_POD}" -n "${NAMESPACE}"
-        
-    #     # Wait for pod to be restarted and ready in a loop with timeout
-    #     echo "Waiting for PingFederate admin pod to restart..."
-    #     MAX_WAIT_SECONDS=180  # 3 minutes
-    #     INTERVAL=10  # check every 10 seconds
-    #     ELAPSED=0
-    #     READY=false
-        
-    #     while [ $ELAPSED -lt $MAX_WAIT_SECONDS ]; do
-    #       echo "Checking pod status (${ELAPSED}s elapsed)..."
-          
-    #       # Check if pod exists
-    #       PF_POD=$(kubectl get pods -n "${NAMESPACE}" | grep pingfederate-admin | awk '{print $1}')
-    #       if [ -z "${PF_POD}" ]; then
-    #         echo "Pod not yet recreated. Waiting..."
-    #         sleep $INTERVAL
-    #         ELAPSED=$((ELAPSED + INTERVAL))
-    #         continue
-    #       fi
-          
-    #       # Check for crash loop
-    #       RESTARTS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.containerStatuses[0].restartCount}')
-    #       if [ $RESTARTS -gt 1 ]; then
-    #         echo "ERROR: PingFederate admin pod is in a crash loop with ${RESTARTS} restarts."
-    #         kubectl describe pod "${PF_POD}" -n "${NAMESPACE}"
-    #         exit 1
-    #       fi
-          
-    #       # Check if ready
-    #       POD_STATUS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.phase}')
-    #       READY_STATUS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.containerStatuses[0].ready}')
-          
-    #       if [ "$POD_STATUS" = "Running" ] && [ "$READY_STATUS" = "true" ]; then
-    #         echo "PingFederate admin pod restarted successfully and is ready"
-    #         READY=true
-    #         # Wait a bit longer for services to fully initialize
-    #         sleep 20
-    #         break
-    #       fi
-          
-    #       sleep $INTERVAL
-    #       ELAPSED=$((ELAPSED + INTERVAL))
-    #     done
-        
-    #     if [ "$READY" != "true" ]; then
-    #       echo "ERROR: Timed out waiting for PingFederate admin pod to restart after ${MAX_WAIT_SECONDS} seconds"
-    #       kubectl describe pod "${PF_POD}" -n "${NAMESPACE}"
-    #       exit 1
-    #     fi
+
     - name: Replicate PingFederation Configuration
       if: ${{ steps.infra_status.outputs.integrated_branch == 'true' && ((steps.tf_apply_first.outputs.needs_retry != 'true' && steps.tf_apply_first.outcome == 'success') || (steps.tf_apply_first.outputs.needs_retry == 'true' && steps.tf_apply_retry.outcome == 'success')) }}
       run: |-
