@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     pingone = {
       source  = "pingidentity/pingone"
@@ -8,6 +8,10 @@ terraform {
     davinci = {
       source  = "pingidentity/davinci"
       version = ">= 0.5.0, < 1.0.0"
+    }
+    pingfederate = {
+      source  = "pingidentity/pingfederate"
+      version = ">= 1.4.0, < 2.0.0"
     }
     http = {
       source  = "hashicorp/http"
@@ -28,6 +32,10 @@ terraform {
     tls = {
       source  = "hashicorp/tls"
       version = "~> 4.0.5"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.7.0"
     }
   }
   backend "s3" {}

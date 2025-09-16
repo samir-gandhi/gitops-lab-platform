@@ -2,21 +2,18 @@ name: Feature Deploy Push
 on: 
   create:
     paths:
-      - 02-configuration/**/*
+      - configuration/**/*
       - .github/workflows/push_config.yml
       - .github/workflows/drift_check.yml
   push:
     paths:
-      - 02-configuration/**/*
+      - configuration/**/*
       - .github/workflows/push_config.yml
       - .github/workflows/drift_check.yml
-
 
 jobs:
   fmt:
     runs-on: ubuntu-latest
-    env:
-      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -24,22 +21,33 @@ jobs:
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         terraform fmt -recursive -check .
 
   lint:
     needs: [fmt]
     runs-on: ubuntu-latest
-    env:
-      TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - uses: actions/checkout@v4
     - uses: terraform-linters/setup-tflint@v4
       name: Setup TFLint
       with:
         tflint_version: latest
-
     - name: tflint
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         echo "***Running terraform lint***"
         tflint --recursive
 
@@ -55,9 +63,16 @@ jobs:
       uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
     - run: |-
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        _tfdir=02-configuration
+        _tfdir=configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
@@ -91,16 +106,35 @@ jobs:
       uses: actions/checkout@v4
     - name: Configure AWS Credentials
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
         aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
         aws configure set region ${AWS_REGION}
     - name: Check Infrastructure Status
+      id: infra_status
       run: |
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        ## set enable_infrastructure_integration based on branch name
+        case "${_branch}" in
+          int-*|prod|qa)
+            echo "integrated_branch=true" >> $GITHUB_OUTPUT
+            ;;
+          *)
+            echo "integrated_branch=false" >> $GITHUB_OUTPUT
+            echo "Non-integrated branch, skipping infrastructure status check."
+            exit 0
+            ;;
+        esac
         _aws_bucket="${TF_VAR_tf_state_bucket}"
         STATUS_FILE="s3://${_aws_bucket}/branch_infra_status/${_branch}/infra_status.json"
         
@@ -156,11 +190,12 @@ jobs:
           fi
         done
     - uses: hashicorp/setup-terraform@v3
-    - name: Terraform Apply
+    - name: Terraform Init
+      id: tf_init
       run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
-        _tfdir=02-configuration
+        _tfdir=configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
         export TF_VAR_pingone_environment_name=${_branch}
         case $_branch in
@@ -178,17 +213,143 @@ jobs:
           -backend-config="bucket=$TF_VAR_tf_state_bucket" \
           -backend-config="region=$TF_VAR_tf_state_region" \
           -backend-config="key=${_stateKey}"
-        echo "***Running terraform apply***"
-        terraform -chdir=${_tfdir} apply --auto-approve
+        echo "TFDIR=${_tfdir}" >> $GITHUB_ENV
+        echo "BRANCH=${_branch}" >> $GITHUB_ENV
+    - name: Terraform Apply (first attempt)
+      id: tf_apply_first
+      env:
+        integrated_branch: ${{ steps.infra_status.outputs.integrated_branch }}
+      run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _tfdir=configuration
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        export TF_VAR_pingone_environment_name=${_branch}
+        # default output
+        echo "needs_retry=false" >> "$GITHUB_OUTPUT"
+        exit_code_file=$(mktemp)
+        ## Capture output in file and print to stdout
+        stdbuf -oL terraform -chdir="${_tfdir}" apply --auto-approve -no-color -input=false 2>&1 | tee "${_tfdir}/terraform-apply.out"
+        echo "${PIPESTATUS[0]}" > "${exit_code_file}"
+        set -x
+        ##log exit code for debugging
+        echo "Terraform apply exit code: $(cat "${exit_code_file}")"
+        test "$(cat "${exit_code_file}")" -ne 0 && echo "Terraform apply failed"
+        ## Catch specific errors for retry logic
+        if [ "$(cat "${exit_code_file}")" -ne 0 ] ; then
+          if [ "${integrated_branch}" = "true" ] ; then
+            has_api_error=false
+            has_oauth_error=false
+            if grep -qi "PingFederate API error" "${_tfdir}/terraform-apply.out"; then
+              has_api_error=true
+            fi
+            if grep -qi "Error summary: An error occurred while creating the OAuth Client" "${_tfdir}/terraform-apply.out"; then
+              has_oauth_error=true
+            fi
+            ## Retry only if both errors are present
+            if $has_api_error && $has_oauth_error ; then
+              echo "needs_retry=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+        fi
+        ## Terraform has passed or non-retryable error
+        exit $(cat "${exit_code_file}")
+    
+    - name: Setup Kubernetes config
+      if: ${{ steps.infra_status.outputs.integrated_branch == 'true' && steps.tf_apply_first.outputs.needs_retry == 'true'}}
+      run: |
+        mkdir -p ${HOME}/.kube
+        echo "${{ secrets.KUBECONFIG_YAML }}" | base64 --decode > ${HOME}/.kube/config
+        kubectl version
+
+    ## If retry needed, restart PF pod and reapply
+    - name: Restart PingFederate admin pod (retry path)
+      if: ${{ steps.tf_apply_first.outputs.needs_retry == 'true' }}
+      run: |
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        K8S_NAMESPACE_PREFIX="${TF_VAR_k8s_namespace_prefix:-ping-devops-}"
+        NAMESPACE="${K8S_NAMESPACE_PREFIX}${_branch}"
+        PF_POD=$(kubectl get pods -n "${NAMESPACE}" | grep pingfederate-admin | awk '{print $1}')
+        if [ -z "${PF_POD}" ]; then
+          echo "ERROR: PingFederate admin pod not found in namespace ${NAMESPACE}"
+          echo "The pod should exist after infrastructure deployment."
+          exit 1
+        fi
+        echo "Found PingFederate admin pod: ${PF_POD}"
+        echo "Restarting PingFederate admin pod..."
+        kubectl delete pod "${PF_POD}" -n "${NAMESPACE}"
+
+        echo "Waiting for PingFederate admin pod to restart..."
+        MAX_WAIT_SECONDS=180
+        INTERVAL=10
+        ELAPSED=0
+        READY=false
+        while [ $ELAPSED -lt $MAX_WAIT_SECONDS ]; do
+          echo "Checking pod status (${ELAPSED}s elapsed)..."
+          PF_POD=$(kubectl get pods -n "${NAMESPACE}" | grep pingfederate-admin | awk '{print $1}')
+          if [ -z "${PF_POD}" ]; then
+            echo "Pod not yet recreated. Waiting..."
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+            continue
+          fi
+          RESTARTS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.containerStatuses[0].restartCount}')
+          if [ ${RESTARTS:-0} -gt 1 ]; then
+            echo "ERROR: PingFederate admin pod is in a crash loop with ${RESTARTS} restarts."
+            kubectl describe pod "${PF_POD}" -n "${NAMESPACE}"
+            break
+          fi
+          POD_STATUS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.phase}')
+          READY_STATUS=$(kubectl get pod "${PF_POD}" -n "${NAMESPACE}" -o jsonpath='{.status.containerStatuses[0].ready}')
+          if [ "$POD_STATUS" = "Running" ] && [ "$READY_STATUS" = "true" ]; then
+            echo "PingFederate admin pod restarted successfully and is ready"
+            READY=true
+            sleep 20
+            break
+          fi
+          sleep $INTERVAL
+          ELAPSED=$((ELAPSED + INTERVAL))
+        done
+        if [ "$READY" != "true" ]; then
+          echo "ERROR: Timed out waiting for PingFederate admin pod to restart after ${MAX_WAIT_SECONDS} seconds"
+          kubectl describe pod "${PF_POD}" -n "${NAMESPACE}"
+          exit 1
+        fi
+
+    - name: Terraform Apply (retry)
+      if: ${{ steps.tf_apply_first.outputs.needs_retry == 'true' }}
+      id: tf_apply_retry
+      run: |-
+        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
+        source tfvars
+        _tfdir=configuration
+        _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
+        export TF_VAR_pingone_environment_name=${_branch}
+
+        export TF_IN_AUTOMATION=1
+        export TF_CLI_ARGS_apply="-no-color -input=false"
+        exit_code_file=$(mktemp)
+        ## Capture output in file and print to stdout
+        (
+          stdbuf -oL terraform -chdir="${_tfdir}" apply --auto-approve -no-color -input=false 2>&1
+          echo $? > "${exit_code_file}"
+        ) | tee "${_tfdir}/terraform-apply.out"
+        exit $(cat "${exit_code_file}")
+
     - name: Replicate PingFederation Configuration
+      if: ${{ steps.infra_status.outputs.integrated_branch == 'true' && ((steps.tf_apply_first.outputs.needs_retry != 'true' && steps.tf_apply_first.outcome == 'success') || (steps.tf_apply_first.outputs.needs_retry == 'true' && steps.tf_apply_retry.outcome == 'success')) }}
       run: |-
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _tfdir=02-configuration
         _branch=$(echo "${GITHUB_REF}" | sed -e "s#refs/heads/##g")
-        _host="https://pingfederate-admin-${_branch}.ping-devops.com"
+        _host="https://${_branch}-pingfederate-admin.ping-devops.com"
         _uri="/pf-admin-api/v1/cluster/replicate"
         curl -k -X POST "${_host}${_uri}" \
           -H "Content-Type: application/json" \
           -H "X-XSRF-Header: $(date +%s)" \
           -u "${TF_VAR_pingfederate_api_username}:${TF_VAR_pingfederate_api_password}"
+

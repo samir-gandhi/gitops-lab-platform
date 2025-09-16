@@ -20,9 +20,6 @@ resource "davinci_flow" "pingone_davinci_api_protect_example" {
 
   log_level = 2
 
-  deploy = true
-
-
   // Connector link: httpConnector
   connection_link {
     id                           = davinci_connection.httpconnector__867ed4363b2bc21c860085ad2baa817d.id

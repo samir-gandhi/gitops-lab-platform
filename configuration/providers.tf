@@ -57,4 +57,4 @@ provider "acme" {
 # │ Details:
 # │   - Code:     INVALID_VALUE
 # │     Message:  The certificate that is attached to your distribution was not issued by a trusted Certificate Authority. For more details, see: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html#alternate-domain-names-requirements
-# │ 
+# │
