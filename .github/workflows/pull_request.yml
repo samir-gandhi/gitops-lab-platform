@@ -137,7 +137,12 @@ jobs:
         source tfvars
         _branch="${GITHUB_BASE_REF}"
         export TF_VAR_pingone_environment_name="${_branch}"
-        export TF_VAR_k8s_helm_deployment_name="${_branch}"
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         
         # Set configuration state key based on branch
         case "${_branch}" in
