@@ -54,7 +54,7 @@ jobs:
     - name: TFLint
       run: |
         _branch="${GITHUB_BASE_REF}"
-        echo "***Running terraform lint on configuration directory***"\
+        echo "***Running terraform lint on configuration directory***"
         case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
         if $integrated; then
           cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
