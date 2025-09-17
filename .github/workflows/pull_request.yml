@@ -29,6 +29,13 @@ jobs:
     - uses: hashicorp/setup-terraform@v3
     - name: fmt-check
       run: |
+        branch=${GITHUB_REF#refs/heads/}
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         terraform fmt -recursive -check .
 
   lint:
@@ -47,12 +54,15 @@ jobs:
     - name: TFLint
       run: |
         _branch="${GITHUB_BASE_REF}"
-        echo "***Running terraform lint on configuration directory***"
-        for _tfdir in "configuration"; do
-          echo "Linting directory: ${_tfdir}"
-          cd ${GITHUB_WORKSPACE}/${_tfdir}
-          tflint
-        done
+        echo "***Running terraform lint on configuration directory***"\
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
+        echo "***Running terraform lint***"
+        tflint --recursive
 
   validate:
     needs: [lint]
@@ -70,6 +80,12 @@ jobs:
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _branch="${GITHUB_BASE_REF}"
+        case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
+        if $integrated; then
+          cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
+        else
+          rm -f configuration/pf_integration.stack.tf || true
+        fi
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
         
@@ -136,13 +152,13 @@ jobs:
         echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
         source tfvars
         _branch="${GITHUB_BASE_REF}"
-        export TF_VAR_pingone_environment_name="${_branch}"
         case "$branch" in int-*|prod|qa) integrated=true ;; *) integrated=false ;; esac
         if $integrated; then
           cp configuration/pf_integration.stack.tpl configuration/pf_integration.stack.tf
         else
           rm -f configuration/pf_integration.stack.tf || true
         fi
+        export TF_VAR_pingone_environment_name="${_branch}"
         
         # Set configuration state key based on branch
         case "${_branch}" in
