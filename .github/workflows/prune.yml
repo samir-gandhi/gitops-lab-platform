@@ -56,7 +56,7 @@ jobs:
         _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
         export TF_VAR_pingone_environment_name="${_branch}"
         export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        _tfdir="02-configuration"
+        _tfdir="configuration"
         _stateKey="${TF_VAR_tf_state_key_prefix_platform:-platform-state}/dev/${_branch}/terraform.tfstate"
         
         terraform -chdir=${_tfdir} init \
@@ -157,7 +157,7 @@ jobs:
         fi
         
         # Second attempt at destroying configuration
-        _tfdir="02-configuration"
+        _tfdir="configuration"
         _stateKey="${TF_VAR_tf_state_key_prefix_platform:-platform-state}/dev/${_branch}/terraform.tfstate"
         
         echo "Second attempt at destroying configuration..."
@@ -168,28 +168,3 @@ jobs:
           
         # No continue-on-error here - if it fails, the workflow should fail
         terraform -chdir=${_tfdir} destroy --auto-approve
-    
-    - name: Destroy Infrastructure
-      # Only continue on error if explicitly requested
-      continue-on-error: false
-      run: |-
-        echo $TERRAFORM_ENV_BASE64 | base64 -d > tfvars
-        source tfvars
-        _ref=$(echo "${{ github.event.ref }}" | sed -e "s#refs/heads/##g")
-        _branch="$(echo "${_ref}" | sed -e "s#refs/heads/##g")"
-        export TF_VAR_pingone_environment_name="${_branch}"
-        export TF_VAR_k8s_helm_deployment_name="${_branch}"
-        _tfdir="01-infrastructure"
-        _stateKey="${TF_VAR_tf_state_key_prefix_infrastructure:-infrastructure-state}/dev/${_branch}/terraform.tfstate"
-        
-        terraform -chdir=${_tfdir} init \
-          -backend-config="bucket=$TF_VAR_tf_state_bucket" \
-          -backend-config="region=$TF_VAR_tf_state_region" \
-          -backend-config="key=${_stateKey}"
-        
-        # If this fails, the workflow should fail
-        terraform -chdir=${_tfdir} destroy --auto-approve
-        
-        # Clean up S3 status files after successful destroy
-        echo "Cleaning up S3 status files..."
-        aws s3 rm "s3://$TF_VAR_tf_state_bucket/branch_infra_status/${_branch}" --recursive || true

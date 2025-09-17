@@ -58,10 +58,16 @@ pingcli:
 	  exit 1; \
 	fi
 
+kubeconfig:
+	@echo "==> Setting up kubeconfig..."
+	@./scripts/kubeconfig.sh
+
 devcheck:
 	@$(MAKE) validate
 	@$(MAKE) clean-pf-stack
 	@$(MAKE) fmt
+	@$(MAKE) kubeconfig
+
 .PHONY: devcheck validate fmt fmt-check tflint trivy pingcli gen-pf-stack clean-pf-stack
 	@$(MAKE) tflint
 	@$(MAKE) trivy

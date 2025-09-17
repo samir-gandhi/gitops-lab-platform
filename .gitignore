@@ -22,6 +22,7 @@ global.js
 *.tfstate.*
 **/.tfstate
 **/.tfstate.*
+terraform-plan.out
 terraform-apply.out
 terraform-debug.log
 
