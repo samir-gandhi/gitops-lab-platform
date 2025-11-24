@@ -23,7 +23,7 @@ jobs:
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
     - uses: hashicorp/setup-terraform@v3
@@ -37,7 +37,7 @@ jobs:
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - uses: terraform-linters/setup-tflint@v4
       name: Setup TFLint
@@ -63,7 +63,7 @@ jobs:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - uses: hashicorp/setup-terraform@v3
     - name: Terraform Validate
       run: |-
@@ -114,7 +114,7 @@ jobs:
     env:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Trivy
       uses: aquasecurity/trivy-action@master
       with:
@@ -129,7 +129,7 @@ jobs:
       TERRAFORM_ENV_BASE64: ${{ secrets.TERRAFORM_ENV_BASE64 }}
     steps:
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - uses: hashicorp/setup-terraform@v3
     - name: Run Terraform Plan for Configuration
       run: |-
