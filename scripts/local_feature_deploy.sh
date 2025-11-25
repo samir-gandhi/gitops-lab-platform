@@ -339,6 +339,16 @@ if [ "${_command}" = "destroy" ]; then
       exit ${terraform_exit_code}
     fi
   fi
+elif echo "${_command}" | grep -q "^plan"; then
+  # Handle plan command (including generate flag)
+  echo "Running terraform ${_command} for branch: ${_branch}..."
+  terraform -chdir="${TFDIR}" ${_command}
+  terraform_exit_code=$?
+  
+  if [ ${terraform_exit_code} -ne 0 ]; then
+    echo "Terraform ${_command} failed."
+    exit ${terraform_exit_code}
+  fi
 else
   # For apply command
   echo "Running terraform ${_command} for branch: ${_branch}..."

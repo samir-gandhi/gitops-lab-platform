@@ -23,7 +23,7 @@ resource "pingone_notification_template_content" "email" {
     #      </div>
     # </div>
     # EOT
-    subject = "Magic Link Authentication"
+    subject = "Magic Link Authentication - change"
 
     from = {
       name    = "PingOne"
