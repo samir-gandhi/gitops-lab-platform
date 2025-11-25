@@ -84,3 +84,16 @@ resource "pingone_application_resource_grant" "oidc_sdk_sample_app_revoke_scope"
     pingone_resource_scope.revoke.id
   ]
 }
+
+# __generated__ by Terraform from "6e67e44d-d415-455a-b588-566edaed0b48/375f4b4c-583b-4a1c-8ae6-25534d2f5690"
+resource "pingone_resource" "pingcli__abc123" {
+  access_token_validity_seconds = 3600
+  application_permissions_settings = {
+    claim_enabled = false
+  }
+  audience                        = "abc123"
+  description                     = null
+  environment_id                  = pingone_environment.target_environment.id
+  introspect_endpoint_auth_method = "CLIENT_SECRET_BASIC"
+  name                            = "abc123"
+}
