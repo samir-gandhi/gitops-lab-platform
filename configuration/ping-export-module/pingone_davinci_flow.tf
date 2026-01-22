@@ -7,10 +7,10 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
   color       = "#CACED3"
 
   settings = {
-    csp                                  = "worker-src 'self' blob:; script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://devsdk.singularkey.com http://cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval';"
-    intermediate_loading_screen_css      = ""
-    intermediate_loading_screen_html     = ""
-    log_level                            = 2
+    csp                              = "worker-src 'self' blob:; script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://devsdk.singularkey.com http://cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval';"
+    intermediate_loading_screen_css  = ""
+    intermediate_loading_screen_html = ""
+    log_level                        = 2
   }
 
   graph_data = {
@@ -18,8 +18,8 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
       nodes = {
         "09anefv002" = {
           data = {
-            id              = "09anefv002"
-            node_type       = "EVAL"
+            id        = "09anefv002"
+            node_type = "EVAL"
             properties = jsonencode({
               "7h8bs4vxuo" = {
                 "value" = "allTriggersFalse"
@@ -57,12 +57,12 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "saveVariables" = {
                 "value" = [
                   {
-                    "key" = 0.5428342378678097,
-                    "label" = "userId (string - flowInstance)",
-                    "name" = "userId",
+                    "key"         = 0.5428342378678097,
+                    "label"       = "userId (string - flowInstance)",
+                    "name"        = "userId",
                     "nameDefault" = "id",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"id\",\n        \"data\": \"{{local.6i7lwwrw94.payload.output.user.id}}\",\n        \"tooltip\": \"{{local.6i7lwwrw94.payload.output.user.id}}\",\n        \"children\": [\n          {\n            \"text\": \"id\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"id\",\n        \"data\": \"{{local.6i7lwwrw94.payload.output.user.id}}\",\n        \"tooltip\": \"{{local.6i7lwwrw94.payload.output.user.id}}\",\n        \"children\": [\n          {\n            \"text\": \"id\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               }
@@ -96,12 +96,12 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "saveVariables" = {
                 "value" = [
                   {
-                    "key" = 0.8779096515773732,
-                    "label" = "userId (string - flowInstance)",
-                    "name" = "userId",
+                    "key"         = 0.8779096515773732,
+                    "label"       = "userId (string - flowInstance)",
+                    "name"        = "userId",
                     "nameDefault" = "id",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"id\",\n        \"data\": \"{{local.m4sfmek769.payload.output.matchedUser.id}}\",\n        \"tooltip\": \"{{local.m4sfmek769.payload.output.matchedUser.id}}\",\n        \"children\": [\n          {\n            \"text\": \"id\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"id\",\n        \"data\": \"{{local.m4sfmek769.payload.output.matchedUser.id}}\",\n        \"tooltip\": \"{{local.m4sfmek769.payload.output.matchedUser.id}}\",\n        \"children\": [\n          {\n            \"text\": \"id\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               }
@@ -165,8 +165,8 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
         }
         "75k6wc3j9i" = {
           data = {
-            id              = "75k6wc3j9i"
-            node_type       = "EVAL"
+            id        = "75k6wc3j9i"
+            node_type = "EVAL"
             properties = jsonencode({
               "jr1f287nlq" = {
                 "value" = "allTriggersFalse"
@@ -188,8 +188,8 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
         }
         "87jn430mui" = {
           data = {
-            id              = "87jn430mui"
-            node_type       = "EVAL"
+            id        = "87jn430mui"
+            node_type = "EVAL"
             properties = jsonencode({
               "kc7wrmpc93" = {
                 "value" = "allTriggersFalse"
@@ -211,8 +211,8 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
         }
         "a6rirjd0m2" = {
           data = {
-            id              = "a6rirjd0m2"
-            node_type       = "EVAL"
+            id        = "a6rirjd0m2"
+            node_type = "EVAL"
           }
           position = {
             x = 1072
@@ -242,33 +242,33 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "claimsNameValuePairs" = {
                 "value" = [
                   {
-                    "key" = 0.3076393052734512,
-                    "name" = null,
+                    "key"         = 0.3076393052734512,
+                    "name"        = null,
                     "nameDefault" = "level",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"level\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.level}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.level}}\",\n        \"children\": [\n          {\n            \"text\": \"level\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"level\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.level}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.level}}\",\n        \"children\": [\n          {\n            \"text\": \"level\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   },
                   {
-                    "key" = 0.18337199639822654,
-                    "name" = null,
+                    "key"         = 0.18337199639822654,
+                    "name"        = null,
                     "nameDefault" = "score",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"score\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.score}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.score}}\",\n        \"children\": [\n          {\n            \"text\": \"score\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"score\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.score}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.output.rawResponse.result.score}}\",\n        \"children\": [\n          {\n            \"text\": \"score\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   },
                   {
-                    "key" = 0.5430462947447765,
-                    "name" = null,
+                    "key"         = 0.5430462947447765,
+                    "name"        = null,
                     "nameDefault" = "rawResponse",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"rawResponse\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.output.rawResponse}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.output.rawResponse}}\",\n        \"children\": [\n          {\n            \"text\": \"rawResponse\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"rawResponse\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.output.rawResponse}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.output.rawResponse}}\",\n        \"children\": [\n          {\n            \"text\": \"rawResponse\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   },
                   {
-                    "key" = 0.10159057010255945,
-                    "label" = null,
-                    "name" = null,
+                    "key"         = 0.10159057010255945,
+                    "label"       = null,
+                    "name"        = null,
                     "nameDefault" = "success",
-                    "type" = null,
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"success\",\n        \"data\": \"{{local.6i7lwwrw94.payload.success}}\",\n        \"tooltip\": \"{{local.6i7lwwrw94.payload.success}}\",\n        \"children\": [\n          {\n            \"text\": \"success\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = null,
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"success\",\n        \"data\": \"{{local.6i7lwwrw94.payload.success}}\",\n        \"tooltip\": \"{{local.6i7lwwrw94.payload.success}}\",\n        \"children\": [\n          {\n            \"text\": \"success\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               },
@@ -308,11 +308,11 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "claimsNameValuePairs" = {
                 "value" = [
                   {
-                    "key" = 0.8800805675019314,
-                    "name" = null,
+                    "key"         = 0.8800805675019314,
+                    "name"        = null,
                     "nameDefault" = "message",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.sxdpclcyko.payload.error.message}}\",\n        \"tooltip\": \"{{local.sxdpclcyko.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.sxdpclcyko.payload.error.message}}\",\n        \"tooltip\": \"{{local.sxdpclcyko.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               }
@@ -349,11 +349,11 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "claimsNameValuePairs" = {
                 "value" = [
                   {
-                    "key" = 0.617681003488906,
-                    "name" = null,
+                    "key"         = 0.617681003488906,
+                    "name"        = null,
                     "nameDefault" = "message",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.p53gq7n410.payload.error.message}}\",\n        \"tooltip\": \"{{local.p53gq7n410.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.p53gq7n410.payload.error.message}}\",\n        \"tooltip\": \"{{local.p53gq7n410.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               }
@@ -390,11 +390,11 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "claimsNameValuePairs" = {
                 "value" = [
                   {
-                    "key" = 0.578323540163898,
-                    "name" = null,
+                    "key"         = 0.578323540163898,
+                    "name"        = null,
                     "nameDefault" = "message",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.6i7lwwrw94.payload.error.message}}\",\n        \"tooltip\": \"{{local.6i7lwwrw94.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.6i7lwwrw94.payload.error.message}}\",\n        \"tooltip\": \"{{local.6i7lwwrw94.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               }
@@ -508,8 +508,8 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
         }
         "n6js2rcdqf" = {
           data = {
-            id              = "n6js2rcdqf"
-            node_type       = "EVAL"
+            id        = "n6js2rcdqf"
+            node_type = "EVAL"
             properties = jsonencode({
               "gznrygimzf" = {
                 "value" = "allTriggersFalse"
@@ -567,8 +567,8 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
         }
         "rvgypb5svi" = {
           data = {
-            id              = "rvgypb5svi"
-            node_type       = "EVAL"
+            id        = "rvgypb5svi"
+            node_type = "EVAL"
           }
           position = {
             x = 1072
@@ -634,11 +634,11 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
               "claimsNameValuePairs" = {
                 "value" = [
                   {
-                    "key" = 0.7318766750020025,
-                    "name" = null,
+                    "key"         = 0.7318766750020025,
+                    "name"        = null,
                     "nameDefault" = "message",
-                    "type" = "string",
-                    "value" = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.error.message}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
+                    "type"        = "string",
+                    "value"       = "[\n  {\n    \"children\": [\n      {\n        \"text\": \"\"\n      },\n      {\n        \"text\": \"\"\n      },\n      {\n        \"type\": \"link\",\n        \"src\": \"pingIdentity.svg\",\n        \"url\": \"message\",\n        \"data\": \"{{local.l9q5mxjjtm.payload.error.message}}\",\n        \"tooltip\": \"{{local.l9q5mxjjtm.payload.error.message}}\",\n        \"children\": [\n          {\n            \"text\": \"message\"\n          }\n        ]\n      },\n      {\n        \"text\": \"\"\n      }\n    ]\n  }\n]"
                   }
                 ]
               }
@@ -659,9 +659,9 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
         }
         "yqi3iaujxx" = {
           data = {
-            id              = "yqi3iaujxx"
-            node_type       = "EVAL"
-            label           = "Evaluator"
+            id        = "yqi3iaujxx"
+            node_type = "EVAL"
+            label     = "Evaluator"
             properties = jsonencode({
               "0di26c5iy7" = {
                 "value" = "anyTriggersFalse"
@@ -1064,33 +1064,33 @@ resource "pingone_davinci_flow" "pingcli__PingOne-0020-DaVinci-0020-API-0020-Pro
     user_panning_enabled  = true
     box_selection_enabled = true
 
-    renderer = jsonencode({"name":"null"})
+    renderer = jsonencode({ "name" : "null" })
   }
 
   input_schema = [
     {
-      property_name           = "email"
-      preferred_data_type     = "string"
-      preferred_control_type  = "textField"
-      required                = true
-      is_expanded             = true
-      description             = ""
+      property_name          = "email"
+      preferred_data_type    = "string"
+      preferred_control_type = "textField"
+      required               = true
+      is_expanded            = true
+      description            = ""
     },
     {
-      property_name           = "password"
-      preferred_data_type     = "string"
-      preferred_control_type  = "textField"
-      required                = true
-      is_expanded             = true
-      description             = ""
+      property_name          = "password"
+      preferred_data_type    = "string"
+      preferred_control_type = "textField"
+      required               = true
+      is_expanded            = true
+      description            = ""
     },
     {
-      property_name           = "riskData"
-      preferred_data_type     = "string"
-      preferred_control_type  = "textField"
-      required                = true
-      is_expanded             = true
-      description             = ""
+      property_name          = "riskData"
+      preferred_data_type    = "string"
+      preferred_control_type = "textField"
+      required               = true
+      is_expanded            = true
+      description            = ""
     }
   ]
 
